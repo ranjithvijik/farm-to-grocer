@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    // ============================================
+    // TARGET & MODULE
+    // ============================================
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    // ============================================
+    // STRICT TYPE CHECKING
+    // ============================================
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    // ============================================
+    // JSX CONFIGURATION (Next.js)
+    // ============================================
+    "jsx": "preserve",
+
+    // ============================================
+    // INCREMENTAL COMPILATION
+    // ============================================
+    "incremental": true,
+
+    // ============================================
+    // PATH ALIASES
+    // ============================================
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/types/*": ["./types/*"],
+      "@/hooks/*": ["./hooks/*"],
+      "@/styles/*": ["./styles/*"],
+      "@/utils/*": ["./lib/utils/*"],
+      "@/config/*": ["./config/*"],
+      "@/public/*": ["./public/*"]
+    },
+
+    // ============================================
+    // ADDITIONAL STRICT CHECKS (Recommended)
+    // ============================================
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+
+    // ============================================
+    // DECORATORS (for libraries like class-validator)
+    // ============================================
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // ============================================
+    // NEXT.JS SPECIFIC
+    // ============================================
+    "allowJs": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+
+  // ============================================
+  // INCLUDE PATTERNS
+  // ============================================
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts",
+    ".next/types/**/*.ts"
+  ],
+
+  // ============================================
+  // EXCLUDE PATTERNS
+  // ============================================
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/__tests__/**",
+    "playwright-report",
+    "test-results"
+  ]
+}

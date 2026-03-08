@@ -1,0 +1,293 @@
+# ═══════════════════════════════════════════════════════════════
+# FARM-TO-GROCER MVP - DOCKER COMPOSE CONFIGURATION
+# ═══════════════════════════════════════════════════════════════
+#
+# This docker-compose.yml provides a complete local development
+# environment with all required services.
+#
+# Usage:
+#   Development:  docker-compose up -d
+#   Production:   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   Logs:         docker-compose logs -f [service]
+#   Stop:         docker-compose down
+#   Reset:        docker-compose down -v (removes volumes)
+#
+# ═══════════════════════════════════════════════════════════════
+
+version: "3.9"
+
+# ───────────────────────────────────────────────────────────────
+# SERVICES
+# ───────────────────────────────────────────────────────────────
+
+services:
+  # ═══════════════════════════════════════════════════════════
+  # NEXT.JS APPLICATION
+  # ═══════════════════════════════════════════════════════════
+  app:
+    container_name: farmtogrocer-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/farmtogrocer?schema=public
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-super-secret-dev-key-change-in-production}
+      - REDIS_URL=redis://redis:6379
+    env_file:
+      - .env.local
+    volumes:
+      # Mount source code for hot reloading
+      - .:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - farmtogrocer-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ═══════════════════════════════════════════════════════════
+  # POSTGRESQL DATABASE
+  # ═══════════════════════════════════════════════════════════
+  db:
+    container_name: farmtogrocer-db
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: farmtogrocer
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      # Persist database data
+      - postgres-data:/var/lib/postgresql/data
+      # Initialize database with custom scripts (optional)
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - farmtogrocer-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d farmtogrocer"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ═══════════════════════════════════════════════════════════
+  # REDIS (Caching & Sessions)
+  # ═══════════════════════════════════════════════════════════
+  redis:
+    container_name: farmtogrocer-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    networks:
+      - farmtogrocer-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ═══════════════════════════════════════════════════════════
+  # PRISMA STUDIO (Database GUI)
+  # ═══════════════════════════════════════════════════════════
+  prisma-studio:
+    container_name: farmtogrocer-prisma-studio
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npx prisma studio
+    ports:
+      - "5555:5555"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/farmtogrocer?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - farmtogrocer-network
+    profiles:
+      - tools
+
+  # ═══════════════════════════════════════════════════════════
+  # MAILHOG (Email Testing)
+  # ═══════════════════════════════════════════════════════════
+  mailhog:
+    container_name: farmtogrocer-mailhog
+    image: mailhog/mailhog:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP server
+      - "8025:8025"  # Web UI
+    networks:
+      - farmtogrocer-network
+    profiles:
+      - tools
+
+  # ═══════════════════════════════════════════════════════════
+  # MINIO (S3-Compatible Object Storage)
+  # ═══════════════════════════════════════════════════════════
+  minio:
+    container_name: farmtogrocer-minio
+    image: minio/minio:latest
+    restart: unless-stopped
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - farmtogrocer-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles:
+      - storage
+
+  # ═══════════════════════════════════════════════════════════
+  # NGINX (Reverse Proxy - Production)
+  # ═══════════════════════════════════════════════════════════
+  nginx:
+    container_name: farmtogrocer-nginx
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - farmtogrocer-network
+    profiles:
+      - production
+
+  # ═══════════════════════════════════════════════════════════
+  # PGADMIN (PostgreSQL Admin UI)
+  # ═══════════════════════════════════════════════════════════
+  pgadmin:
+    container_name: farmtogrocer-pgadmin
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@farmtogrocer.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - db
+    networks:
+      - farmtogrocer-network
+    profiles:
+      - tools
+
+  # ═══════════════════════════════════════════════════════════
+  # REDIS COMMANDER (Redis GUI)
+  # ═══════════════════════════════════════════════════════════
+  redis-commander:
+    container_name: farmtogrocer-redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    networks:
+      - farmtogrocer-network
+    profiles:
+      - tools
+
+# ───────────────────────────────────────────────────────────────
+# NETWORKS
+# ───────────────────────────────────────────────────────────────
+
+networks:
+  farmtogrocer-network:
+    name: farmtogrocer-network
+    driver: bridge
+
+# ───────────────────────────────────────────────────────────────
+# VOLUMES
+# ───────────────────────────────────────────────────────────────
+
+volumes:
+  postgres-data:
+    name: farmtogrocer-postgres-data
+  redis-data:
+    name: farmtogrocer-redis-data
+  minio-data:
+    name: farmtogrocer-minio-data
+  pgadmin-data:
+    name: farmtogrocer-pgadmin-data
+
+# ═══════════════════════════════════════════════════════════════
+# USAGE EXAMPLES
+# ═══════════════════════════════════════════════════════════════
+#
+# Start core services (app, db, redis):
+#   docker-compose up -d
+#
+# Start with development tools (Prisma Studio, PgAdmin, etc.):
+#   docker-compose --profile tools up -d
+#
+# Start with S3 storage (MinIO):
+#   docker-compose --profile storage up -d
+#
+# Start everything:
+#   docker-compose --profile tools --profile storage up -d
+#
+# View logs:
+#   docker-compose logs -f app
+#   docker-compose logs -f db
+#
+# Run database migrations:
+#   docker-compose exec app npx prisma migrate dev
+#
+# Open Prisma Studio:
+#   docker-compose --profile tools up prisma-studio
+#
+# Access services:
+#   - App:            http://localhost:3000
+#   - Prisma Studio:  http://localhost:5555
+#   - PgAdmin:        http://localhost:5050
+#   - MailHog:        http://localhost:8025
+#   - MinIO Console:  http://localhost:9001
+#   - Redis Commander: http://localhost:8081
+#
+# ═══════════════════════════════════════════════════════════════
