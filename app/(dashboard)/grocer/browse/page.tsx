@@ -4,8 +4,7 @@ import * as React from "react";
 import { ProductGrid } from "@/components/ProductGrid";
 import { ProductFilter } from "@/components/ProductFilter";
 import { ProductCategory } from "@/types";
-import { Search, ShoppingBag } from "lucide-react";
-import { DashboardShell } from "@/app/(dashboard)/dashboard-shell";
+import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 
