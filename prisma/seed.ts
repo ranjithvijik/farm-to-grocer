@@ -390,7 +390,7 @@ async function main() {
                     pricePerUnit: 8.5,
                     availableQty: 60,
                     isOrganic: false,
-                    images: ['https://images.unsplash.com/photo-1551028150-64b9f398f678?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1516100882582-96c3a05fe590?w=800&q=80'],
                 },
                 {
                     farmerId: farmer4.id,
@@ -468,7 +468,7 @@ async function main() {
                     pricePerUnit: 4.5,
                     availableQty: 80,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1510166089176-b57564a542b1?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1510127814815-f6280373df56?w=800&q=80'],
                 },
             ],
         });
