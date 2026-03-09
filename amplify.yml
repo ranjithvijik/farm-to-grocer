@@ -40,19 +40,23 @@ applications:
                 echo "Testing connectivity..."
                 if npx ts-node --compiler-options '{"module":"CommonJS"}' scripts/test-db-connection.ts; then
                   echo "Database reachable!"
-                  echo "Running database migrations..."
-                  if npx prisma migrate deploy; then
-                    echo "Migrations completed successfully."
-                  else
-                    echo "WARNING - Migrations failed, continuing build."
-                  fi
-                  if [ "$FORCE_SEED" = "true" ]; then
-                    echo "Force seeding database..."
-                    if npx prisma db seed; then
-                      echo "Seeding completed successfully."
-                    else
-                      echo "WARNING - Seeding failed, continuing build."
+                  echo "Synchronizing database schema (db push)..."
+                  if npx prisma db push --accept-data-loss; then
+                    echo "Schema synchronized successfully."
+                    # Seed if FORCE_SEED is true OR if database is empty
+                    SHOULD_SEED=false
+                    if [ "$FORCE_SEED" = "true" ]; then SHOULD_SEED=true; fi
+                    if ! node -e "const { PrismaClient } = require('@prisma/client'); const p = new PrismaClient(); p.product.count().then(c => process.exit(c > 0 ? 0 : 1)).catch(() => process.exit(1))"; then
+                      echo "Database appears empty, triggering seed..."
+                      SHOULD_SEED=true
                     fi
+                    
+                    if [ "$SHOULD_SEED" = "true" ]; then
+                      echo "Seeding database..."
+                      npx prisma db seed
+                    fi
+                  else
+                    echo "WARNING - Schema synchronization failed, continuing build."
                   fi
                 else
                   echo "WARNING - Database not reachable, skipping migrations and seeding."
