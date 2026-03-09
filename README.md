@@ -92,11 +92,13 @@ Farm to Grocer provides a modern, easy-to-use platform where:
 | Feature | Description |
 |---------|-------------|
 | ✅ Secure Auth | Email/password + Google OAuth + Magic Links |
+| ✅ Modern Design Theme | Global premium glassmorphism aesthetic with engaging micro-animations |
 | ✅ Role-Based Access | Farmer, Grocer, and Admin roles |
 | ✅ Real-time Notifications | Order updates, messages, alerts |
 | ✅ Responsive Design | Mobile-first, works on all devices |
 | ✅ Dark Mode | Full dark theme support |
 | ✅ Stripe Payments | Secure payment processing |
+| ✅ System Observability | Robust `/api/health` monitoring for db/memory/config tracking |
 | ✅ Email Notifications | Transactional emails via Resend |
 
 ---
@@ -247,11 +249,11 @@ farm-to-grocer/
 | Configuration Files | 14 | ✅ Complete |
 | Library/Utilities | 3 | ✅ Complete |
 | Type Definitions | 1 | ✅ Complete |
-| API Routes | 5 | ✅ Complete |
+| API Routes | 6 | ✅ Complete |
 | UI Components | 6 | ✅ Complete |
 | Feature Components | 5 | ✅ Complete |
-| App Pages & Layouts | 15 | ✅ Complete |
-| **TOTAL** | **45** | ✅ **100%** |
+| App Pages & Layouts | 27 | ✅ Complete (Includes Docs, Legal, Marketing) |
+| **TOTAL** | **62** | ✅ **100%** |
 
 ### 🔧 Configuration Files (14)
 
@@ -531,6 +533,13 @@ Click **"Save and deploy"**. Amplify will:
 3. Configure DNS as instructed
 4. SSL certificate is automatic
 
+#### Troubleshooting Deployment
+
+If your Amplify deployment fails at the database connection step:
+- Ensure your `DATABASE_URL` environment variable is fully qualified (e.g., ends in `/postgres?schema=public`).
+- **Authentication Failed**: Verify the RDS Master Password in your AWS Console matches your `DATABASE_URL`. Even a small typo (like `FarmToGrocer2026`) requires an AWS Console modification to fix.
+- **SSR Variables**: Amplify requires secrets to be explicitly written to `.env.production` during the build phase (already handled via our `amplify.yml` specification).
+
 ### Docker Deployment
 
 #### Build & Run
@@ -638,6 +647,12 @@ All authenticated endpoints require a valid session cookie.
 | `PUT` | `/api/orders/[id]` | Grocer | Update order |
 | `PATCH` | `/api/orders/[id]` | Auth | Update status |
 | `DELETE` | `/api/orders/[id]` | Grocer | Cancel order |
+
+### System API
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/health` | Public | Diagnostic endpoint reporting database connectivity, detailed memory metrics, API latency, and config readiness. Returns strict `503` if dependent services are down. |
 
 ### Response Format
 
