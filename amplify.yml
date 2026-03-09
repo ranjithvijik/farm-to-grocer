@@ -1,57 +1,18 @@
-# ═══════════════════════════════════════════════════════════════
 # FARM-TO-GROCER MVP - AWS AMPLIFY BUILD SPECIFICATION
-# ═══════════════════════════════════════════════════════════════
-#
-# This amplify.yml configures the CI/CD pipeline for deploying
-# a Next.js 14 SSR application to AWS Amplify Hosting.
-#
-# Documentation: https://docs.aws.amazon.com/amplify/latest/userguide/
-#
-# Features:
-# - Next.js 14 App Router with SSR support
-# - Prisma database migrations
-# - Environment variable injection
-# - Build caching for faster deployments
-# - Preview deployments for pull requests
-#
-# ═══════════════════════════════════════════════════════════════
+# This configures CI/CD for Next.js 14 SSR on AWS Amplify.
 
 version: 1
-
-# ───────────────────────────────────────────────────────────────
-# APPLICATIONS (Frontend + Backend)
-# ───────────────────────────────────────────────────────────────
 
 applications:
   - appRoot: .
     frontend:
-      # ═══════════════════════════════════════════════════════════
-      # BUILD PHASES
-      # ═══════════════════════════════════════════════════════════
       phases:
-        # ─────────────────────────────────────────────────────────
-        # PRE-BUILD: Install dependencies & setup
-        # ─────────────────────────────────────────────────────────
         preBuild:
           commands:
-            # Display Node.js and npm versions for debugging
             - 'echo "Node.js version:" && node --version'
             - 'echo "npm version:" && npm --version'
-            
-            # Install pnpm globally (if using pnpm)
-            # Uncomment if your project uses pnpm
-            # - npm install -g pnpm
-            # - pnpm --version
-            
-            # Install dependencies
-            # Using npm ci for faster, reliable installs
-            - npm ci
-            
-            # Generate Prisma client
-            - npx prisma generate
-            
-            # Run database migrations (production)
-            # Only run on main/production branch
+            - 'npm ci'
+            - 'npx prisma generate'
             - |
               if [ "$AWS_BRANCH" = "main" ] || [ "$AWS_BRANCH" = "production" ]; then
                 echo "Running database migrations..."
@@ -59,17 +20,10 @@ applications:
               else
                 echo "Skipping migrations for branch $AWS_BRANCH"
               fi
-
-        # ─────────────────────────────────────────────────────────
-        # BUILD: Compile the application
-        # ─────────────────────────────────────────────────────────
         build:
           commands:
-            # Display build information
-            - 'echo "Building Farm-to-Grocer for branch: $AWS_BRANCH"'
+            - 'echo "Building Farm-to-Grocer for branch $AWS_BRANCH"'
             - 'echo "Commit: $AWS_COMMIT_ID"'
-            
-            # Set environment-specific variables
             - |
               if [ "$AWS_BRANCH" = "main" ] || [ "$AWS_BRANCH" = "production" ]; then
                 export NODE_ENV=production
@@ -78,77 +32,22 @@ applications:
                 export NODE_ENV=development
                 echo "Building for PREVIEW/DEVELOPMENT"
               fi
-            
-            # Run Next.js build
-            - npm run build
-            
-            # Display build completion
-            - echo "Build completed successfully!"
-
-        # ─────────────────────────────────────────────────────────
-        # POST-BUILD: Cleanup & verification (optional)
-        # ─────────────────────────────────────────────────────────
+            - 'npm run build'
+            - 'echo "Build completed successfully!"'
         postBuild:
           commands:
-            - echo "Post-build phase complete"
-            # Optional: Run post-build scripts
-            # - npm run postbuild
-
-      # ═══════════════════════════════════════════════════════════
-      # BUILD ARTIFACTS
-      # ═══════════════════════════════════════════════════════════
+            - 'echo "Post-build phase complete"'
       artifacts:
-        # Base directory for Next.js SSR output
-        # IMPORTANT: Must be .next for SSR applications
         baseDirectory: .next
-        
-        # Files to include in deployment
         files:
           - '**/*'
-
-      # ═══════════════════════════════════════════════════════════
-      # BUILD CACHE
-      # ═══════════════════════════════════════════════════════════
-      # Caching significantly speeds up subsequent builds
       cache:
         paths:
-          # Cache node_modules to speed up npm ci
-          - node_modules/**/*
-          
-          # Cache Next.js build cache
-          - .next/cache/**/*
-          
-          # Cache Prisma client
-          - node_modules/.prisma/**/*
-          
-          # Cache npm cache directory
-          - ~/.npm/**/*
+          - 'node_modules/**/*'
+          - '.next/cache/**/*'
+          - 'node_modules/.prisma/**/*'
+          - '~/.npm/**/*'
 
-
-# ───────────────────────────────────────────────────────────────
-# ENVIRONMENT VARIABLES
-# ───────────────────────────────────────────────────────────────
-# 
-# Set these in the AWS Amplify Console under:
-# App Settings > Environment Variables
-#
-# Required variables:
-# - DATABASE_URL          : PostgreSQL connection string
-# - NEXTAUTH_SECRET       : NextAuth.js secret key
-# - NEXTAUTH_URL          : Application URL (auto-set by Amplify)
-#
-# Optional variables:
-# - GOOGLE_CLIENT_ID      : Google OAuth client ID
-# - GOOGLE_CLIENT_SECRET  : Google OAuth client secret
-# - STRIPE_SECRET_KEY     : Stripe API key
-# - UPLOADTHING_SECRET    : UploadThing API key
-# - RESEND_API_KEY        : Email service API key
-#
-# ───────────────────────────────────────────────────────────────
-
-# ───────────────────────────────────────────────────────────────
-# CUSTOM HEADERS (Optional)
-# ───────────────────────────────────────────────────────────────
 customHeaders:
   - pattern: '**/*'
     headers:
@@ -162,74 +61,22 @@ customHeaders:
         value: '1; mode=block'
       - key: 'Referrer-Policy'
         value: 'strict-origin-when-cross-origin'
-
-  # Cache static assets
   - pattern: '/_next/static/**/*'
     headers:
       - key: 'Cache-Control'
         value: 'public, max-age=31536000, immutable'
-
-  # Cache images
   - pattern: '/images/**/*'
     headers:
       - key: 'Cache-Control'
         value: 'public, max-age=86400'
 
-# ───────────────────────────────────────────────────────────────
-# REDIRECTS & REWRITES
-# ───────────────────────────────────────────────────────────────
 customRules:
-  # Redirect www to non-www (or vice versa)
-  # Uncomment and modify as needed
-  # - source: 'https://www.farmtogrocer.com/<*>'
-  #   target: 'https://farmtogrocer.com/<*>'
-  #   status: '301'
-
-  # Handle 404 errors - redirect to custom 404 page
   - source: '/<*>'
     target: '/index.html'
     status: '404-200'
-
-  # API routes should not be rewritten
   - source: '/api/<*>'
     target: '/api/<*>'
     status: '200'
-
-  # Static files
   - source: '/_next/<*>'
     target: '/_next/<*>'
     status: '200'
-
-# ═══════════════════════════════════════════════════════════════
-# DEPLOYMENT NOTES
-# ═══════════════════════════════════════════════════════════════
-#
-# 1. CONNECTING TO GITHUB:
-#    - Go to AWS Amplify Console
-#    - Click "New app" > "Host web app"
-#    - Select GitHub and authorize
-#    - Choose your repository and branch
-#
-# 2. ENVIRONMENT VARIABLES:
-#    Set these in Amplify Console > App Settings > Environment Variables:
-#    
-#    DATABASE_URL=postgresql://user:pass@host:5432/db
-#    NEXTAUTH_SECRET=your-secret-key
-#    NEXTAUTH_URL=https://your-app.amplifyapp.com
-#    
-# 3. BRANCH DEPLOYMENTS:
-#    - main/production → Production environment
-#    - develop → Staging environment
-#    - feature/* → Preview deployments
-#
-# 4. CUSTOM DOMAIN:
-#    - Go to App Settings > Domain management
-#    - Add your custom domain
-#    - Configure DNS records as instructed
-#
-# 5. MONITORING:
-#    - Build logs: Amplify Console > App > Build history
-#    - Access logs: CloudWatch Logs
-#    - Metrics: CloudWatch Metrics
-#
-# ═══════════════════════════════════════════════════════════════
