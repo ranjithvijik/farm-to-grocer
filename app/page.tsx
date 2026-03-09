@@ -118,7 +118,7 @@ const HOW_IT_WORKS = [
     step: "03",
     title: "Order with Confidence",
     desc: "Place orders directly, message your farmer, and track delivery in real time — all in one place.",
-    img: "https://images.unsplash.com/photo-1595196113184-e9104fa27546?w=800&q=80",
+    img: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80",
   },
 ];
 
@@ -126,7 +126,7 @@ const TESTIMONIALS = [
   {
     name: "Sarah Chen",
     role: "Head Buyer, Green Leaf Markets",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=200&q=80",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80",
     quote: "Farm to Grocer saved us 18% on produce costs in the first quarter while improving freshness dramatically.",
     stars: 5,
     farm: "Works with Agriberry Farms",
