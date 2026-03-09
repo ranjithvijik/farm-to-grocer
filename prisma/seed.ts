@@ -318,7 +318,7 @@ async function main() {
                     pricePerUnit: 24.0,
                     availableQty: 20,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1595855759920-86582396756a?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1614735241165-6756e1df61ab?w=800&q=80'],
                 },
             ],
         });
@@ -372,7 +372,7 @@ async function main() {
                     pricePerUnit: 60.0,
                     availableQty: 20,
                     isOrganic: false,
-                    images: ['https://images.unsplash.com/photo-1621262799307-8884964be0c4?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1484156818044-c040038b0719?w=800&q=80'],
                 },
             ],
         });
@@ -390,7 +390,7 @@ async function main() {
                     pricePerUnit: 8.5,
                     availableQty: 60,
                     isOrganic: false,
-                    images: ['https://images.unsplash.com/photo-1588168333986-507efd3ae09d?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1588347785102-294427242761?w=800&q=80'],
                 },
                 {
                     farmerId: farmer4.id,
@@ -432,7 +432,7 @@ async function main() {
                     pricePerUnit: 5.5,
                     availableQty: 50,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1550583724-125581820ffb?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1563636619-e910f01ff18a?w=800&q=80'],
                 },
                 {
                     farmerId: farmer5.id,
@@ -468,7 +468,7 @@ async function main() {
                     pricePerUnit: 4.5,
                     availableQty: 80,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1589133095560-645479261a29?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1542601906990-b4d3fb773b09?w=800&q=80'],
                 },
             ],
         });
