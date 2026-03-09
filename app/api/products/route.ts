@@ -14,17 +14,25 @@ import prisma, {
   isPrismaError,
   getPrismaErrorMessage,
 } from "@/lib/prisma";
-import { getSession, requireFarmer } from "@/lib/auth";
-import {
-  ProductCategory,
-  ProductUnit,
-  ProductStatus,
-  type ApiResponse,
-  type PaginatedResponse,
-  type Product,
-  type ProductWithFarmer,
-  type ProductSearchParams,
+import { requireFarmer } from "@/lib/auth";
+import type {
+  ProductWithFarmer,
+  ProductSearchParams,
+  ApiResponse,
+  PaginatedResponse,
 } from "@/types";
+import { Product } from "@prisma/client";
+
+export type ProductWithDetails = Product & {
+  farmer: {
+    user: {
+      name: string | null;
+      email: string | null;
+      phone: string | null;
+      image: string | null;
+    };
+  };
+};
 
 // ============================================
 // VALIDATION SCHEMAS
@@ -42,11 +50,33 @@ const createProductSchema = z.object({
     .string()
     .max(2000, "Description must be less than 2000 characters")
     .optional(),
-  category: z.nativeEnum(ProductCategory, {
-    errorMap: () => ({ message: "Invalid product category" }),
+  category: z.enum([
+    "VEGETABLES",
+    "FRUITS",
+    "DAIRY",
+    "MEAT",
+    "POULTRY",
+    "GRAINS",
+    "HERBS",
+    "EGGS",
+    "HONEY",
+    "OTHER",
+  ], {
+    required_error: "Category is required",
   }),
-  unit: z.nativeEnum(ProductUnit, {
-    errorMap: () => ({ message: "Invalid product unit" }),
+  unit: z.enum([
+    "LB",
+    "KG",
+    "OZ",
+    "BUNCH",
+    "DOZEN",
+    "GALLON",
+    "LITER",
+    "PIECE",
+    "CASE",
+    "PALLET",
+  ], {
+    required_error: "Unit is required",
   }),
   pricePerUnit: z
     .number()
@@ -95,7 +125,18 @@ const createProductSchema = z.object({
  */
 const searchParamsSchema = z.object({
   query: z.string().optional(),
-  category: z.nativeEnum(ProductCategory).optional(),
+  category: z.enum([
+    "VEGETABLES",
+    "FRUITS",
+    "DAIRY",
+    "MEAT",
+    "POULTRY",
+    "GRAINS",
+    "HERBS",
+    "EGGS",
+    "HONEY",
+    "OTHER",
+  ]).optional(),
   farmerId: z.string().cuid().optional(),
   minPrice: z.coerce.number().nonnegative().optional(),
   maxPrice: z.coerce.number().positive().optional(),
@@ -130,7 +171,7 @@ const searchParamsSchema = z.object({
  */
 function buildWhereClause(params: ProductSearchParams) {
   const where: any = {
-    status: ProductStatus.ACTIVE,
+    status: "ACTIVE",
   };
 
   // Text search
@@ -402,7 +443,7 @@ export async function POST(
         harvestDate: data.harvestDate,
         expiryDate: data.expiryDate,
         tags: data.tags.map((tag) => tag.toLowerCase()),
-        status: ProductStatus.ACTIVE,
+        status: "ACTIVE",
       },
     });
 
@@ -444,7 +485,7 @@ export async function POST(
 // CORS preflight handler
 // ============================================
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new NextResponse(null, {
     status: 204,
     headers: {

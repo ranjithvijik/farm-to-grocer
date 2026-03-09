@@ -30,7 +30,6 @@ import {
   Loader2,
   Upload,
   Phone,
-  Mail,
   Globe,
   Camera,
 } from "lucide-react";
@@ -47,7 +46,7 @@ interface SessionUser {
   name?: string | null;
   email?: string | null;
   image?: string | null;
-  role?: "FARMER" | "GROCER";
+  role?: "FARMER" | "GROCER" | "ADMIN";
 }
 
 interface OnboardingWizardProps {
@@ -98,12 +97,6 @@ const steps: Step[] = [
 // VALIDATION SCHEMAS
 // ============================================
 
-const roleSchema = z.object({
-  role: z.enum(["FARMER", "GROCER"], {
-    required_error: "Please select a role",
-  }),
-});
-
 const farmerBusinessSchema = z.object({
   farmName: z.string().min(2, "Farm name must be at least 2 characters"),
   farmDescription: z.string().min(10, "Please provide a brief description (min 10 characters)"),
@@ -140,7 +133,7 @@ const profileSchema = z.object({
 
 // Combined schema type
 type OnboardingData = {
-  role?: "FARMER" | "GROCER";
+  role?: "FARMER" | "GROCER" | "ADMIN";
   // Farmer fields
   farmName?: string;
   farmDescription?: string;
@@ -182,9 +175,7 @@ export function OnboardingWizard({ user }: OnboardingWizardProps) {
   });
 
   // Get current step info
-  const step = steps[currentStep];
-  const isFirstStep = currentStep === 0;
-  const isLastStep = currentStep === steps.length - 1;
+  const step = steps[currentStep]!;
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   // Update form data
@@ -359,7 +350,7 @@ interface StepProps {
 }
 
 function RoleStep({ data, onUpdate, onNext }: StepProps) {
-  const [selectedRole, setSelectedRole] = React.useState<"FARMER" | "GROCER" | undefined>(
+  const [selectedRole, setSelectedRole] = React.useState<"FARMER" | "GROCER" | "ADMIN" | undefined>(
     data.role
   );
 
@@ -495,19 +486,19 @@ function BusinessStep({ data, onUpdate, onNext, onBack }: StepProps) {
     resolver: zodResolver(schema),
     defaultValues: isFarmer
       ? {
-          farmName: data.farmName || "",
-          farmDescription: data.farmDescription || "",
-          farmSize: data.farmSize || "",
-          farmingType: data.farmingType || [],
-          yearsInOperation: data.yearsInOperation || "",
-        }
+        farmName: data.farmName || "",
+        farmDescription: data.farmDescription || "",
+        farmSize: data.farmSize || "",
+        farmingType: data.farmingType || [],
+        yearsInOperation: data.yearsInOperation || "",
+      }
       : {
-          businessName: data.businessName || "",
-          businessDescription: data.businessDescription || "",
-          businessType: data.businessType || "",
-          storeSize: data.storeSize || "",
-          weeklyBudget: data.weeklyBudget || "",
-        },
+        businessName: data.businessName || "",
+        businessDescription: data.businessDescription || "",
+        businessType: data.businessType || "",
+        storeSize: data.storeSize || "",
+        weeklyBudget: data.weeklyBudget || "",
+      },
   });
 
   const farmingTypes = [
@@ -982,7 +973,6 @@ function ProfileStep({ data, onUpdate, onSubmit, onBack, isSubmitting }: Profile
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {

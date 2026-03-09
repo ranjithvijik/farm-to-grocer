@@ -201,7 +201,7 @@ function createRedirect(url: string, request: NextRequest): NextResponse {
 /**
  * Create a next response with security headers
  */
-function createNext(request: NextRequest): NextResponse {
+function createNext(_request: NextRequest): NextResponse {
   const response = NextResponse.next();
   return addSecurityHeaders(response);
 }

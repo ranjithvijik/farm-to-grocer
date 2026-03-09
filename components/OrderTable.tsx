@@ -24,7 +24,6 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Search,
-  Filter,
   X,
   MoreHorizontal,
   Eye,
@@ -39,13 +38,10 @@ import {
 } from "lucide-react";
 import { cn, formatCurrency, formatDate, formatRelativeTime } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import {
-  Order,
   OrderStatus,
   PaymentStatus,
   OrderStatusLabels,
-  OrderStatusColors,
 } from "@/types";
 
 // ============================================
@@ -267,7 +263,6 @@ export function OrderTable({
   orders,
   viewMode,
   onStatusUpdate,
-  onViewOrder,
   onSelectionChange,
   isLoading = false,
   showFilters = true,
@@ -295,7 +290,6 @@ export function OrderTable({
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(defaultPageSize);
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [showFilterPanel, setShowFilterPanel] = React.useState(false);
   const [actionMenuOpen, setActionMenuOpen] = React.useState<string | null>(null);
 
   // ─────────────────────────────────────────
@@ -1032,5 +1026,4 @@ export function OrderTable({
 // EXPORTS
 // ============================================
 
-export { OrderStatusBadge, PaymentStatusBadge };
 export default OrderTable;

@@ -32,7 +32,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 
 // ============================================
 // VALIDATION SCHEMA
@@ -103,7 +102,7 @@ interface LoginFormProps {
 export function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // State
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -123,7 +122,7 @@ export function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     setFocus,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -173,7 +172,8 @@ export function LoginForm({ callbackUrl = "/" }: LoginFormProps) {
           AccountSuspended: "Your account has been suspended. Please contact support.",
           Default: "An error occurred. Please try again.",
         };
-        setError(errorMessages[result.error] || errorMessages.Default);
+        const errorMessage = (result.error ? errorMessages[result.error] : errorMessages.Default) || errorMessages.Default;
+        setError(errorMessage as string);
         setFocus("email");
       } else if (result?.ok) {
         // Successful login - redirect

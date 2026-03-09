@@ -34,7 +34,6 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardFooter } from "@/components/ui/Card";
 import {
-  Product,
   ProductCategory,
   ProductUnit,
   ProductCategoryLabels,

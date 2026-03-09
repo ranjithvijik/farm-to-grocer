@@ -99,7 +99,7 @@ export function formatDate(
   format: "short" | "medium" | "long" | "full" = "medium"
 ): string {
   const d = new Date(date);
-  
+
   if (isNaN(d.getTime())) {
     return "Invalid date";
   }
@@ -125,7 +125,7 @@ export function formatDateTime(
   options?: Intl.DateTimeFormatOptions
 ): string {
   const d = new Date(date);
-  
+
   if (isNaN(d.getTime())) {
     return "Invalid date";
   }
@@ -150,7 +150,7 @@ export function formatDateTime(
  */
 export function formatRelativeTime(date: Date | string | number): string {
   const d = new Date(date);
-  
+
   if (isNaN(d.getTime())) {
     return "Invalid date";
   }
@@ -204,7 +204,7 @@ export function formatRelativeTime(date: Date | string | number): string {
  */
 export function formatTime(date: Date | string | number): string {
   const d = new Date(date);
-  
+
   if (isNaN(d.getTime())) {
     return "Invalid time";
   }
@@ -541,7 +541,7 @@ export function shuffle<T>(arr: T[]): T[] {
   const result = [...arr];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    [result[i], result[j]] = [result[j]!, result[i]!];
   }
   return result;
 }

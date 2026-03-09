@@ -215,10 +215,10 @@ export function ToastProvider({
       prev.map((toast) =>
         toast.id === id
           ? {
-              ...toast,
-              ...options,
-              type: options.type || toast.type,
-            }
+            ...toast,
+            ...options,
+            type: options.type || toast.type,
+          }
           : toast
       )
     );
@@ -387,7 +387,7 @@ interface ToastItemProps {
   isTop: boolean;
 }
 
-function ToastItem({ toast, onDismiss, index, isTop }: ToastItemProps) {
+function ToastItem({ toast, onDismiss, isTop }: ToastItemProps) {
   const [isVisible, setIsVisible] = React.useState(false);
   const [isExiting, setIsExiting] = React.useState(false);
 
@@ -452,8 +452,8 @@ function ToastItem({ toast, onDismiss, index, isTop }: ToastItemProps) {
         isVisible && !isExiting
           ? "opacity-100 translate-y-0"
           : isTop
-          ? "opacity-0 -translate-y-2"
-          : "opacity-0 translate-y-2"
+            ? "opacity-0 -translate-y-2"
+            : "opacity-0 translate-y-2"
       )}
       role="alert"
       aria-live="assertive"
@@ -578,7 +578,7 @@ export interface ToasterProps {
  *   };
  * }
  */
-export function Toaster(props: ToasterProps) {
+export function Toaster(_props: ToasterProps) {
   // This component is just a marker - actual rendering happens in ToastProvider
   return null;
 }
@@ -651,11 +651,5 @@ Add this to your globals.css:
 // ============================================
 // EXPORTS
 // ============================================
-
-export {
-  ToastProvider,
-  ToastContainer,
-  ToastItem,
-};
 
 export default Toaster;

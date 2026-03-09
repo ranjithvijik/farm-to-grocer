@@ -15,15 +15,13 @@ import prisma, {
   getPrismaErrorMessage,
   withTransaction,
 } from "@/lib/prisma";
-import { getSession, requireAuth } from "@/lib/auth";
-import {
+import { getSession } from "@/lib/auth";
+import type {
   OrderStatus,
-  PaymentStatus,
-  DeliveryMethod,
-  NotificationType,
-  type ApiResponse,
-  type OrderWithDetails,
+  ApiResponse,
+  OrderWithDetails,
 } from "@/types";
+import { NotificationType } from "@prisma/client";
 
 // ============================================
 // ROUTE CONTEXT TYPE
@@ -44,36 +42,36 @@ interface RouteContext {
  * Key: current status, Value: allowed next statuses
  */
 const FARMER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
-  [OrderStatus.CONFIRMED]: [OrderStatus.PROCESSING],
-  [OrderStatus.PROCESSING]: [OrderStatus.READY_FOR_PICKUP, OrderStatus.OUT_FOR_DELIVERY],
-  [OrderStatus.READY_FOR_PICKUP]: [OrderStatus.DELIVERED],
-  [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED],
-  [OrderStatus.DELIVERED]: [],
-  [OrderStatus.CANCELLED]: [],
-  [OrderStatus.REFUNDED]: [],
+  ["PENDING"]: ["CONFIRMED", "CANCELLED"],
+  ["CONFIRMED"]: ["PROCESSING"],
+  ["PROCESSING"]: ["READY_FOR_PICKUP", "OUT_FOR_DELIVERY"],
+  ["READY_FOR_PICKUP"]: ["DELIVERED"],
+  ["OUT_FOR_DELIVERY"]: ["DELIVERED"],
+  ["DELIVERED"]: [],
+  ["CANCELLED"]: [],
+  ["REFUNDED"]: [],
 };
 
 const GROCER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  [OrderStatus.PENDING]: [OrderStatus.CANCELLED],
-  [OrderStatus.CONFIRMED]: [OrderStatus.CANCELLED],
-  [OrderStatus.PROCESSING]: [],
-  [OrderStatus.READY_FOR_PICKUP]: [OrderStatus.DELIVERED],
-  [OrderStatus.OUT_FOR_DELIVERY]: [],
-  [OrderStatus.DELIVERED]: [],
-  [OrderStatus.CANCELLED]: [],
-  [OrderStatus.REFUNDED]: [],
+  ["PENDING"]: ["CANCELLED"],
+  ["CONFIRMED"]: ["CANCELLED"],
+  ["PROCESSING"]: [],
+  ["READY_FOR_PICKUP"]: ["DELIVERED"],
+  ["OUT_FOR_DELIVERY"]: [],
+  ["DELIVERED"]: [],
+  ["CANCELLED"]: [],
+  ["REFUNDED"]: [],
 };
 
 const ADMIN_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED, OrderStatus.REFUNDED],
-  [OrderStatus.CONFIRMED]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED, OrderStatus.REFUNDED],
-  [OrderStatus.PROCESSING]: [OrderStatus.READY_FOR_PICKUP, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.CANCELLED, OrderStatus.REFUNDED],
-  [OrderStatus.READY_FOR_PICKUP]: [OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REFUNDED],
-  [OrderStatus.OUT_FOR_DELIVERY]: [OrderStatus.DELIVERED, OrderStatus.CANCELLED, OrderStatus.REFUNDED],
-  [OrderStatus.DELIVERED]: [OrderStatus.REFUNDED],
-  [OrderStatus.CANCELLED]: [OrderStatus.REFUNDED],
-  [OrderStatus.REFUNDED]: [],
+  ["PENDING"]: ["CONFIRMED", "CANCELLED", "REFUNDED"],
+  ["CONFIRMED"]: ["PROCESSING", "CANCELLED", "REFUNDED"],
+  ["PROCESSING"]: ["READY_FOR_PICKUP", "OUT_FOR_DELIVERY", "CANCELLED", "REFUNDED"],
+  ["READY_FOR_PICKUP"]: ["DELIVERED", "CANCELLED", "REFUNDED"],
+  ["OUT_FOR_DELIVERY"]: ["DELIVERED", "CANCELLED", "REFUNDED"],
+  ["DELIVERED"]: ["REFUNDED"],
+  ["CANCELLED"]: ["REFUNDED"],
+  ["REFUNDED"]: [],
 };
 
 /**
@@ -110,23 +108,22 @@ const updateOrderSchema = z.object({
  * Schema for status update (PATCH)
  */
 const statusUpdateSchema = z.object({
-  status: z.nativeEnum(OrderStatus, {
+  status: z.enum([
+    "PENDING",
+    "CONFIRMED",
+    "PROCESSING",
+    "READY_FOR_PICKUP",
+    "OUT_FOR_DELIVERY",
+    "DELIVERED",
+    "CANCELLED",
+    "REFUNDED",
+  ], {
     errorMap: () => ({ message: "Invalid order status" }),
   }),
   reason: z
     .string()
     .max(500, "Reason must be less than 500 characters")
     .optional(),
-  trackingNumber: z
-    .string()
-    .max(100, "Tracking number must be less than 100 characters")
-    .optional(),
-  estimatedDelivery: z
-    .string()
-    .datetime()
-    .optional()
-    .nullable()
-    .transform((val) => (val ? new Date(val) : null)),
 });
 
 // ============================================
@@ -180,7 +177,7 @@ function canCancelOrder(order: { createdAt: Date; status: OrderStatus }): {
   reason?: string;
 } {
   // Check status
-  const cancellableStatuses = [OrderStatus.PENDING, OrderStatus.CONFIRMED];
+  const cancellableStatuses = ["PENDING", "CONFIRMED"];
   if (!cancellableStatuses.includes(order.status)) {
     return {
       canCancel: false,
@@ -245,7 +242,7 @@ function createErrorResponse(
 // ============================================
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: RouteContext
 ): Promise<NextResponse<ApiResponse<OrderWithDetails>>> {
   try {
@@ -316,10 +313,6 @@ export async function GET(
           },
         },
         payment: true,
-        statusHistory: {
-          orderBy: { createdAt: "desc" },
-          take: 10,
-        },
       },
     });
 
@@ -348,7 +341,7 @@ export async function GET(
       allowedStatusTransitions: getAllowedTransitions(order.status, user.role),
     };
 
-    return createResponse(enrichedOrder as OrderWithDetails);
+    return createResponse(enrichedOrder as unknown as OrderWithDetails);
   } catch (error) {
     console.error("GET /api/orders/[id] error:", error);
 
@@ -439,9 +432,9 @@ export async function PUT(
 
     // Check if order can be modified
     const nonModifiableStatuses = [
-      OrderStatus.DELIVERED,
-      OrderStatus.CANCELLED,
-      OrderStatus.REFUNDED,
+      "DELIVERED",
+      "CANCELLED",
+      "REFUNDED",
     ];
     if (nonModifiableStatuses.includes(existingOrder.status)) {
       return createErrorResponse(
@@ -640,7 +633,7 @@ export async function PATCH(
       );
     }
 
-    const { status: newStatus, reason, trackingNumber, estimatedDelivery } = validationResult.data;
+    const { status: newStatus, reason } = validationResult.data;
 
     // Check if status transition is allowed
     const allowedTransitions = getAllowedTransitions(existingOrder.status, user.role);
@@ -653,7 +646,7 @@ export async function PATCH(
     }
 
     // Special handling for cancellation
-    if (newStatus === OrderStatus.CANCELLED) {
+    if (newStatus === "CANCELLED") {
       const cancelCheck = canCancelOrder(existingOrder);
       if (!cancelCheck.canCancel) {
         return createErrorResponse(
@@ -671,17 +664,15 @@ export async function PATCH(
         where: { id },
         data: {
           status: newStatus,
-          trackingNumber: trackingNumber || undefined,
-          estimatedDelivery: estimatedDelivery || undefined,
           updatedAt: new Date(),
           // Set delivery date if delivered
-          ...(newStatus === OrderStatus.DELIVERED && {
+          ...(newStatus === "DELIVERED" && {
             deliveredAt: new Date(),
           }),
           // Set cancellation date if cancelled
-          ...(newStatus === OrderStatus.CANCELLED && {
+          ...(newStatus === "CANCELLED" && {
             cancelledAt: new Date(),
-            cancellationReason: reason,
+            cancelReason: reason,
           }),
         },
         include: {
@@ -724,19 +715,10 @@ export async function PATCH(
         },
       });
 
-      // Create status history entry
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId: id,
-          status: newStatus,
-          previousStatus: existingOrder.status,
-          changedBy: user.id,
-          reason: reason,
-        },
-      });
+
 
       // Handle inventory restoration on cancellation
-      if (newStatus === OrderStatus.CANCELLED) {
+      if (newStatus === "CANCELLED") {
         for (const item of existingOrder.items) {
           await tx.product.update({
             where: { id: item.productId },
@@ -752,25 +734,29 @@ export async function PATCH(
       // Create notifications
       const notificationUserId =
         user.role === "FARMER"
-          ? order.grocer.user.id
-          : order.farmer.user.id;
+          ? existingOrder.grocer.user.id
+          : existingOrder.farmer.user.id;
 
-      const statusMessages: Record<OrderStatus, string> = {
-        [OrderStatus.CONFIRMED]: `Your order #${order.orderNumber} has been confirmed!`,
-        [OrderStatus.PROCESSING]: `Your order #${order.orderNumber} is being prepared.`,
-        [OrderStatus.READY_FOR_PICKUP]: `Your order #${order.orderNumber} is ready for pickup!`,
-        [OrderStatus.OUT_FOR_DELIVERY]: `Your order #${order.orderNumber} is out for delivery!`,
-        [OrderStatus.DELIVERED]: `Your order #${order.orderNumber} has been delivered!`,
-        [OrderStatus.CANCELLED]: `Your order #${order.orderNumber} has been cancelled.`,
-        [OrderStatus.REFUNDED]: `Your order #${order.orderNumber} has been refunded.`,
-        [OrderStatus.PENDING]: "",
+      const statusMessages: Record<string, string> = {
+        ["CONFIRMED"]: `Your order #${order.orderNumber} has been confirmed!`,
+        ["PROCESSING"]: `Your order #${order.orderNumber} is being prepared.`,
+        ["READY_FOR_PICKUP"]: `Your order #${order.orderNumber} is ready for pickup!`,
+        ["OUT_FOR_DELIVERY"]: `Your order #${order.orderNumber} is out for delivery!`,
+        ["DELIVERED"]: `Your order #${order.orderNumber} has been delivered!`,
+        ["CANCELLED"]: `Your order #${order.orderNumber} has been cancelled.`,
+        ["REFUNDED"]: `Your order #${order.orderNumber} has been refunded.`,
+        ["PENDING"]: "",
       };
 
       if (statusMessages[newStatus]) {
         await tx.notification.create({
           data: {
             userId: notificationUserId,
-            type: NotificationType.ORDER_STATUS_CHANGED,
+            type: newStatus === "CONFIRMED" ? NotificationType.ORDER_CONFIRMED :
+              newStatus === "OUT_FOR_DELIVERY" ? NotificationType.ORDER_SHIPPED :
+                newStatus === "DELIVERED" ? NotificationType.ORDER_DELIVERED :
+                  newStatus === "CANCELLED" ? NotificationType.ORDER_CANCELLED :
+                    NotificationType.SYSTEM,
             title: `Order ${newStatus.replace("_", " ")}`,
             message: statusMessages[newStatus],
             link: `/orders/${order.id}`,
@@ -899,23 +885,14 @@ export async function DELETE(
       await tx.order.update({
         where: { id },
         data: {
-          status: OrderStatus.CANCELLED,
+          status: "CANCELLED",
           cancelledAt: new Date(),
-          cancellationReason: reason,
+          cancelReason: reason,
           updatedAt: new Date(),
         },
       });
 
-      // Create status history entry
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId: id,
-          status: OrderStatus.CANCELLED,
-          previousStatus: existingOrder.status,
-          changedBy: user.id,
-          reason: reason,
-        },
-      });
+
 
       // Restore inventory
       for (const item of existingOrder.items) {
@@ -971,7 +948,7 @@ export async function DELETE(
 // CORS preflight handler
 // ============================================
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new NextResponse(null, {
     status: 204,
     headers: {

@@ -19,7 +19,6 @@ import {
   Mail,
   Phone,
   MessageSquare,
-  LogOut,
   HelpCircle,
   FileText,
   Clock,
@@ -27,7 +26,7 @@ import {
   Leaf,
   ExternalLink,
 } from "lucide-react";
-import { SignOutButton } from "./sign-out-button";
+import { SignOutButton } from "@/components/sign-out-button";
 
 // ============================================
 // METADATA
@@ -57,8 +56,8 @@ export default async function SuspendedPage() {
       session.user.status === "PENDING"
         ? "/onboarding"
         : session.user.role === "FARMER"
-        ? "/farmer"
-        : "/grocer";
+          ? "/farmer"
+          : "/grocer";
     redirect(redirectPath);
   }
 
@@ -97,7 +96,7 @@ export default async function SuspendedPage() {
               Account Suspended
             </h1>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              Your Farm to Grocer account has been temporarily suspended. 
+              Your Farm to Grocer account has been temporarily suspended.
               We're here to help you resolve this issue.
             </p>
           </div>
@@ -176,7 +175,7 @@ export default async function SuspendedPage() {
                 <div>
                   <p className="font-medium text-foreground">Contact Support</p>
                   <p className="text-sm text-muted-foreground">
-                    Reach out to our support team for more information about your specific case 
+                    Reach out to our support team for more information about your specific case
                     and to discuss next steps.
                   </p>
                 </div>
@@ -189,7 +188,7 @@ export default async function SuspendedPage() {
                 <div>
                   <p className="font-medium text-foreground">Submit an Appeal</p>
                   <p className="text-sm text-muted-foreground">
-                    If you believe this suspension was made in error, you can submit a formal 
+                    If you believe this suspension was made in error, you can submit a formal
                     appeal for review by our team.
                   </p>
                 </div>
@@ -251,7 +250,7 @@ export default async function SuspendedPage() {
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground mb-1">Submit an Appeal</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  If you believe your account was suspended in error, you can submit a formal 
+                  If you believe your account was suspended in error, you can submit a formal
                   appeal. Our team will review your case within 3-5 business days.
                 </p>
                 <Link
@@ -274,7 +273,7 @@ export default async function SuspendedPage() {
                   Response Time
                 </p>
                 <p className="text-sm text-amber-700 dark:text-amber-300">
-                  Our support team typically responds within 24-48 hours. Appeals are reviewed 
+                  Our support team typically responds within 24-48 hours. Appeals are reviewed
                   within 3-5 business days. Thank you for your patience.
                 </p>
               </div>

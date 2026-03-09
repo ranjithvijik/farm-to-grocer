@@ -39,18 +39,14 @@ import {
   TrendingUp,
   Truck,
   CreditCard,
-  MessageSquare,
   FileText,
   BarChart3,
   Heart,
-  MapPin,
-  Calendar,
   Shield,
   User,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
 
 // ============================================
 // TYPES & INTERFACES

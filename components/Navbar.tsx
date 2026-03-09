@@ -52,11 +52,6 @@ interface NavDropdownItem {
   description?: string;
 }
 
-interface NavDropdown {
-  name: string;
-  items: NavDropdownItem[];
-}
-
 // ============================================
 // NAVIGATION CONFIGURATION
 // ============================================
@@ -355,10 +350,10 @@ export function Navbar({ transparent = false, fixed = true, className }: NavbarP
               ) : (
                 <div className="hidden sm:flex items-center gap-2">
                   <Button variant="ghost" asChild>
-                    <Link href="/login">Sign In</Link>
+                    <Link href="/login"><span>Sign In</span></Link>
                   </Button>
                   <Button asChild>
-                    <Link href="/register">Get Started</Link>
+                    <Link href="/register"><span>Get Started</span></Link>
                   </Button>
                 </div>
               )}
@@ -515,12 +510,12 @@ export function Navbar({ transparent = false, fixed = true, className }: NavbarP
               <div className="space-y-2">
                 <Button variant="outline" className="w-full" asChild>
                   <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    Sign In
+                    <span>Sign In</span>
                   </Link>
                 </Button>
                 <Button className="w-full" asChild>
                   <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                    Get Started
+                    <span>Get Started</span>
                   </Link>
                 </Button>
               </div>

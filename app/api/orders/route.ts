@@ -16,7 +16,7 @@ import prisma, {
   getPrismaErrorMessage,
   withTransaction,
 } from "@/lib/prisma";
-import { getSession, requireAuth, requireGrocer } from "@/lib/auth";
+import { getSession, requireGrocer } from "@/lib/auth";
 import {
   OrderStatus,
   PaymentStatus,
@@ -24,9 +24,7 @@ import {
   NotificationType,
   type ApiResponse,
   type PaginatedResponse,
-  type Order,
   type OrderWithDetails,
-  type OrderSearchParams,
 } from "@/types";
 
 // ============================================
@@ -654,7 +652,7 @@ export async function POST(
 // CORS preflight handler
 // ============================================
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new NextResponse(null, {
     status: 204,
     headers: {

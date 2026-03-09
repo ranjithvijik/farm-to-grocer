@@ -5,14 +5,7 @@
 // This file contains all shared type definitions, interfaces, and enums
 // used throughout the application. Types are organized by domain.
 
-import type {
-  User as PrismaUser,
-  Farmer as PrismaFarmer,
-  Grocer as PrismaGrocer,
-  Product as PrismaProduct,
-  Order as PrismaOrder,
-  OrderItem as PrismaOrderItem,
-  Notification as PrismaNotification,
+import {
   UserRole,
   AccountStatus,
   ProductCategory,
@@ -122,22 +115,22 @@ export const ApiErrorCodes = {
   FORBIDDEN: "FORBIDDEN",
   INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
   TOKEN_EXPIRED: "TOKEN_EXPIRED",
-  
+
   // Validation errors
   VALIDATION_ERROR: "VALIDATION_ERROR",
   INVALID_INPUT: "INVALID_INPUT",
   MISSING_REQUIRED_FIELD: "MISSING_REQUIRED_FIELD",
-  
+
   // Resource errors
   NOT_FOUND: "NOT_FOUND",
   ALREADY_EXISTS: "ALREADY_EXISTS",
   CONFLICT: "CONFLICT",
-  
+
   // Server errors
   INTERNAL_ERROR: "INTERNAL_ERROR",
   DATABASE_ERROR: "DATABASE_ERROR",
   EXTERNAL_SERVICE_ERROR: "EXTERNAL_SERVICE_ERROR",
-  
+
   // Rate limiting
   RATE_LIMITED: "RATE_LIMITED",
 } as const;
@@ -895,6 +888,16 @@ export const ProductUnitLabels: Record<ProductUnit, string> = {
   PIECE: "piece",
   CASE: "case",
   PALLET: "pallet",
+};
+
+/**
+ * Product status labels
+ */
+export const ProductStatusLabels: Record<ProductStatus, string> = {
+  DRAFT: "Draft",
+  ACTIVE: "Active",
+  OUT_OF_STOCK: "Out of Stock",
+  DISCONTINUED: "Discontinued",
 };
 
 /**

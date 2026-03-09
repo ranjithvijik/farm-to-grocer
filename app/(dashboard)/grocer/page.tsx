@@ -16,12 +16,9 @@ import Link from "next/link";
 import {
   ShoppingCart,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
   Package,
   Store,
   Star,
-  Clock,
   ArrowRight,
   ArrowUpRight,
   ArrowDownRight,
@@ -29,18 +26,14 @@ import {
   Heart,
   Truck,
   CheckCircle2,
-  AlertCircle,
   Leaf,
   MapPin,
-  Plus,
   RefreshCw,
 } from "lucide-react";
 
 import { requireGrocer } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { formatCurrency, formatDate, formatRelativeTime } from "@/lib/utils";
-import { OrderStatus, OrderStatusLabels } from "@/types";
-
+import { formatCurrency } from "@/lib/utils";
 // Components
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
@@ -127,7 +120,7 @@ async function getGrocerStats(grocerId: string) {
     }),
 
     // Favorite farmers count
-    prisma.favoriteFarmer.count({
+    prisma.savedFarmer.count({
       where: { grocerId },
     }),
 
@@ -239,7 +232,7 @@ async function getFavoriteSuppliers(grocerId: string, limit: number = 4) {
 /**
  * Fetch recommended products
  */
-async function getRecommendedProducts(grocerId: string, limit: number = 6) {
+async function getRecommendedProducts(limit: number = 6) {
   // Get products from farmers the grocer has ordered from before
   // or highly rated products
   const products = await prisma.product.findMany({
@@ -266,44 +259,6 @@ async function getRecommendedProducts(grocerId: string, limit: number = 6) {
   });
 
   return products;
-}
-
-/**
- * Fetch spending data for chart (last 7 days)
- */
-async function getSpendingChartData(grocerId: string) {
-  const days = 7;
-  const data = [];
-
-  for (let i = days - 1; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    date.setHours(0, 0, 0, 0);
-
-    const nextDate = new Date(date);
-    nextDate.setDate(nextDate.getDate() + 1);
-
-    const daySpending = await prisma.order.aggregate({
-      where: {
-        grocerId,
-        status: { notIn: ["CANCELLED", "REFUNDED"] },
-        createdAt: {
-          gte: date,
-          lt: nextDate,
-        },
-      },
-      _sum: { total: true },
-      _count: true,
-    });
-
-    data.push({
-      date: date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }),
-      spending: daySpending._sum.total || 0,
-      orders: daySpending._count || 0,
-    });
-  }
-
-  return data;
 }
 
 // ============================================
@@ -347,15 +302,14 @@ function StatsCard({ title, value, description, icon, trend, variant = "default"
           <div className="flex items-center gap-2 mt-1">
             {trend && (
               <span
-                className={`inline-flex items-center text-xs font-medium ${
-                  trend.invertColors
-                    ? trend.isPositive
-                      ? "text-red-600"
-                      : "text-green-600"
-                    : trend.isPositive
+                className={`inline-flex items-center text-xs font-medium ${trend.invertColors
+                  ? trend.isPositive
+                    ? "text-red-600"
+                    : "text-green-600"
+                  : trend.isPositive
                     ? "text-green-600"
                     : "text-red-600"
-                }`}
+                  }`}
               >
                 {trend.isPositive ? (
                   <ArrowUpRight className="h-3 w-3 mr-0.5" />
@@ -551,24 +505,6 @@ function RecommendedProducts({ products }: { products: Awaited<ReturnType<typeof
 }
 
 // ============================================
-// LOADING SKELETONS
-// ============================================
-
-function StatsCardSkeleton() {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-8 w-8 rounded-md" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-8 w-20 mb-2" />
-        <Skeleton className="h-3 w-32" />
-      </CardContent>
-    </Card>
-  );
-}
-
 function RecentOrdersSkeleton() {
   return (
     <div className="space-y-4">
@@ -609,7 +545,7 @@ export default async function GrocerDashboardPage() {
     getGrocerStats(grocer.grocerId),
     getRecentOrders(grocer.grocerId),
     getFavoriteSuppliers(grocer.grocerId),
-    getRecommendedProducts(grocer.grocerId),
+    getRecommendedProducts(),
   ]);
 
   return (

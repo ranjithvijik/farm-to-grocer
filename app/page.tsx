@@ -17,7 +17,6 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Leaf,
-  Truck,
   Store,
   ShieldCheck,
   TrendingUp,
@@ -30,7 +29,6 @@ import {
   Package,
   DollarSign,
   ChevronRight,
-  Play,
   Quote,
 } from "lucide-react";
 
@@ -89,21 +87,21 @@ export default function HomePage() {
 
                 {/* Subheadline */}
                 <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0">
-                  Connect directly with local farmers for the freshest produce at wholesale prices. 
+                  Connect directly with local farmers for the freshest produce at wholesale prices.
                   No middlemen, no markups — just farm-fresh quality delivered to your door.
                 </p>
 
                 {/* CTA Buttons */}
                 <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                   <Button size="xl" asChild>
-                    <Link href="/register?role=grocer">
+                    <Link href="/register?role=grocer" className="flex items-center">
                       <Store className="h-5 w-5 mr-2" />
                       I'm a Grocer
                       <ArrowRight className="h-5 w-5 ml-2" />
                     </Link>
                   </Button>
                   <Button size="xl" variant="outline" asChild>
-                    <Link href="/register?role=farmer">
+                    <Link href="/register?role=farmer" className="flex items-center">
                       <Leaf className="h-5 w-5 mr-2" />
                       I'm a Farmer
                     </Link>
@@ -196,7 +194,7 @@ export default function HomePage() {
                 Why Choose Farm to Grocer?
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                We're building the future of local food distribution — connecting farmers directly 
+                We're building the future of local food distribution — connecting farmers directly
                 with grocers for fresher produce and fairer prices.
               </p>
             </div>
@@ -448,9 +446,8 @@ export default function HomePage() {
                     <p className="text-foreground mb-6">{testimonial.quote}</p>
                     <div className="flex items-center gap-3">
                       <div
-                        className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-white ${
-                          testimonial.type === "farmer" ? "bg-green-600" : "bg-primary"
-                        }`}
+                        className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-white ${testimonial.type === "farmer" ? "bg-green-600" : "bg-primary"
+                          }`}
                       >
                         {testimonial.avatar}
                       </div>
@@ -462,11 +459,10 @@ export default function HomePage() {
                     {/* Type Badge */}
                     <div className="absolute top-4 right-4">
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                          testimonial.type === "farmer"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
-                            : "bg-primary/10 text-primary"
-                        }`}
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${testimonial.type === "farmer"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
+                          : "bg-primary/10 text-primary"
+                          }`}
                       >
                         {testimonial.type === "farmer" ? (
                           <Leaf className="h-3 w-3" />
@@ -569,13 +565,13 @@ export default function HomePage() {
               Ready to Transform Your Business?
             </h2>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto">
-              Join hundreds of farmers and grocers already building sustainable food systems together. 
+              Join hundreds of farmers and grocers already building sustainable food systems together.
               Sign up today and start connecting with your local food community.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="xl" variant="secondary" asChild>
-                <Link href="/register?role=grocer">
+                <Link href="/register?role=grocer" className="flex items-center">
                   <Store className="h-5 w-5 mr-2" />
                   Get Started as Grocer
                 </Link>
@@ -586,7 +582,7 @@ export default function HomePage() {
                 className="border-white text-white hover:bg-white hover:text-primary"
                 asChild
               >
-                <Link href="/register?role=farmer">
+                <Link href="/register?role=farmer" className="flex items-center">
                   <Leaf className="h-5 w-5 mr-2" />
                   Join as Farmer
                 </Link>

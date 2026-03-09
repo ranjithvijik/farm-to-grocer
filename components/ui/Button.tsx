@@ -178,7 +178,7 @@ const buttonVariants = cva(
  */
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   /**
    * If true, renders as child component (Slot)
    * Useful for wrapping links or other elements
@@ -263,6 +263,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Determine if button should be disabled
     const isDisabled = disabled || isLoading;
+
+    if (asChild) {
+      return (
+        <Comp
+          className={cn(
+            buttonVariants({ variant, size, fullWidth, rounded }),
+            className
+          )}
+          ref={ref}
+          disabled={isDisabled}
+          aria-disabled={isDisabled}
+          aria-busy={isLoading}
+          {...props}
+        >
+          {children}
+        </Comp>
+      );
+    }
 
     return (
       <Comp

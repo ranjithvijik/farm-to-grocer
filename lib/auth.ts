@@ -22,8 +22,8 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      email: string;
-      name: string;
+      email?: string | null;
+      name?: string | null;
       image?: string | null;
       role: UserRole;
       status: AccountStatus;
@@ -32,23 +32,18 @@ declare module "next-auth" {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface User {
-    id: string;
-    email: string;
-    name: string;
-    image?: string | null;
-    role: UserRole;
-    status: AccountStatus;
+    role?: string;
+    status?: string;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    id: string;
-    email: string;
-    name: string;
-    role: UserRole;
-    status: AccountStatus;
+    id?: string;
+    role?: string;
+    status?: string;
     farmerId?: string;
     grocerId?: string;
   }
@@ -249,7 +244,7 @@ export const authOptions: NextAuthOptions = {
     // ─────────────────────────────────────────
     // Sign In Callback
     // ─────────────────────────────────────────
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // Allow credentials sign in
       if (account?.provider === "credentials") {
         return true;
@@ -324,14 +319,14 @@ export const authOptions: NextAuthOptions = {
       return {
         ...session,
         user: {
-          id: token.id,
+          id: token.id as string,
           email: token.email,
           name: token.name,
           image: session.user?.image,
-          role: token.role,
-          status: token.status,
-          farmerId: token.farmerId,
-          grocerId: token.grocerId,
+          role: token.role as UserRole,
+          status: token.status as AccountStatus,
+          farmerId: token.farmerId as string | undefined,
+          grocerId: token.grocerId as string | undefined,
         },
       };
     },
@@ -428,7 +423,7 @@ export async function requireAuth() {
 export async function requireRole(...roles: UserRole[]) {
   const user = await requireAuth();
 
-  if (!roles.includes(user.role)) {
+  if (!roles.includes(user.role as UserRole)) {
     throw new Error("Forbidden: Insufficient permissions");
   }
 
@@ -473,7 +468,7 @@ export async function requireAdmin() {
  */
 export async function hasRole(...roles: UserRole[]): Promise<boolean> {
   const user = await getCurrentUser();
-  return user ? roles.includes(user.role) : false;
+  return user ? roles.includes(user.role as UserRole) : false;
 }
 
 /**

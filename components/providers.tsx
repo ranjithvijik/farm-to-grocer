@@ -130,7 +130,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to error reporting service
     console.error("Error caught by boundary:", error, errorInfo);
-    
+
     // Call optional error handler
     this.props.onError?.(error, errorInfo);
 
@@ -199,9 +199,9 @@ export function useAnalytics() {
   if (!context) {
     // Return no-op functions if analytics not configured
     return {
-      trackEvent: () => {},
-      trackPageView: () => {},
-      identify: () => {},
+      trackEvent: () => { },
+      trackPageView: () => { },
+      identify: () => { },
     };
   }
   return context;
@@ -307,7 +307,7 @@ function CartProvider({ children }: { children: React.ReactNode }) {
       const existingIndex = prev.findIndex((i) => i.productId === item.productId);
       if (existingIndex >= 0) {
         const updated = [...prev];
-        updated[existingIndex].quantity += item.quantity;
+        updated[existingIndex]!.quantity += item.quantity;
         return updated;
       }
       return [...prev, item];

@@ -10,13 +10,11 @@
 // - Pagination
 // - Loading and empty states
 
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Plus,
   Search,
-  Filter,
   Grid3X3,
   List,
   MoreHorizontal,
@@ -47,9 +45,7 @@ import {
 
 // Components
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard";
+import { Card, CardContent } from "@/components/ui/Card";
 
 // ============================================
 // METADATA
@@ -154,7 +150,7 @@ async function getProducts(
     ACTIVE: 0,
     DRAFT: 0,
     OUT_OF_STOCK: 0,
-    ARCHIVED: 0,
+    DISCONTINUED: 0,
   };
 
   stats.forEach((s) => {
@@ -181,10 +177,9 @@ async function getProducts(
 
 interface ProductRowProps {
   product: any;
-  farmerId: string;
 }
 
-function ProductRow({ product, farmerId }: ProductRowProps) {
+function ProductRow({ product }: ProductRowProps) {
   const primaryImage = product.images?.[0] || "/images/placeholder-product.jpg";
 
   return (
@@ -248,8 +243,8 @@ function ProductRow({ product, farmerId }: ProductRowProps) {
               product.availableQty < 10
                 ? "text-amber-600 font-medium"
                 : product.availableQty === 0
-                ? "text-destructive font-medium"
-                : ""
+                  ? "text-destructive font-medium"
+                  : ""
             }
           >
             {product.availableQty}
@@ -305,7 +300,7 @@ function StatusBadge({ status }: { status: ProductStatus }) {
       className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
       icon: <AlertCircle className="h-3 w-3" />,
     },
-    ARCHIVED: {
+    DISCONTINUED: {
       className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
       icon: <EyeOff className="h-3 w-3" />,
     },
@@ -406,11 +401,10 @@ function Filters({ searchParams, stats }: FiltersProps) {
               status: tab.value,
               page: "1",
             } as any).toString()}`}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              status === tab.value
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${status === tab.value
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             {tab.label}
             <span className="ml-1.5 text-xs text-muted-foreground">({tab.count})</span>
@@ -457,9 +451,8 @@ function Filters({ searchParams, stats }: FiltersProps) {
                 ...searchParams,
                 view: "grid",
               } as any).toString()}`}
-              className={`p-2 ${
-                view === "grid" ? "bg-accent text-foreground" : "text-muted-foreground"
-              }`}
+              className={`p-2 ${view === "grid" ? "bg-accent text-foreground" : "text-muted-foreground"
+                }`}
             >
               <Grid3X3 className="h-4 w-4" />
             </Link>
@@ -468,9 +461,8 @@ function Filters({ searchParams, stats }: FiltersProps) {
                 ...searchParams,
                 view: "list",
               } as any).toString()}`}
-              className={`p-2 ${
-                view === "list" ? "bg-accent text-foreground" : "text-muted-foreground"
-              }`}
+              className={`p-2 ${view === "list" ? "bg-accent text-foreground" : "text-muted-foreground"
+                }`}
             >
               <List className="h-4 w-4" />
             </Link>
@@ -556,11 +548,10 @@ function Pagination({ pagination, searchParams }: PaginationProps) {
               <Link
                 key={pageNum}
                 href={createPageUrl(pageNum)}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  pageNum === currentPage
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                }`}
+                className={`px-3 py-1 rounded-md text-sm ${pageNum === currentPage
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-accent"
+                  }`}
               >
                 {pageNum}
               </Link>
@@ -586,76 +577,7 @@ function Pagination({ pagination, searchParams }: PaginationProps) {
   );
 }
 
-// ============================================
-// LOADING SKELETON
-// ============================================
 
-function ProductsLoadingSkeleton({ view }: { view: "grid" | "list" }) {
-  if (view === "list") {
-    return (
-      <div className="rounded-lg border bg-card overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b bg-muted/50">
-              <th className="w-12 px-4 py-3" />
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Product</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Price</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Stock</th>
-              <th className="px-4 py-3 text-center text-xs font-semibold uppercase">Orders</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Updated</th>
-              <th className="w-20 px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <tr key={i} className="border-b">
-                <td className="px-4 py-3">
-                  <div className="h-4 w-4 bg-muted animate-pulse rounded" />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 bg-muted animate-pulse rounded-lg" />
-                    <div className="space-y-2">
-                      <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                      <div className="h-3 w-20 bg-muted animate-pulse rounded" />
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="h-6 w-16 bg-muted animate-pulse rounded-full" />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="h-4 w-16 bg-muted animate-pulse rounded" />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="h-4 w-12 bg-muted animate-pulse rounded" />
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <div className="h-4 w-8 bg-muted animate-pulse rounded mx-auto" />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="h-4 w-20 bg-muted animate-pulse rounded" />
-                </td>
-                <td className="px-4 py-3">
-                  <div className="h-8 w-16 bg-muted animate-pulse rounded" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <ProductCardSkeleton key={i} variant="grid" />
-      ))}
-    </div>
-  );
-}
 
 // ============================================
 // EMPTY STATE
@@ -782,7 +704,6 @@ export default async function FarmerProductsPage({
                   <ProductRow
                     key={product.id}
                     product={product}
-                    farmerId={farmer.farmerId}
                   />
                 ))}
               </tbody>
@@ -854,13 +775,12 @@ export default async function FarmerProductsPage({
                   </div>
                   <div className="text-right">
                     <p
-                      className={`text-sm font-medium ${
-                        product.availableQty < 10
-                          ? "text-amber-600"
-                          : product.availableQty === 0
+                      className={`text-sm font-medium ${product.availableQty < 10
+                        ? "text-amber-600"
+                        : product.availableQty === 0
                           ? "text-destructive"
                           : "text-muted-foreground"
-                      }`}
+                        }`}
                     >
                       {product.availableQty} in stock
                     </p>

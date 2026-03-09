@@ -25,12 +25,12 @@ declare global {
 const prismaClientOptions = {
   log:
     process.env.NODE_ENV === "development"
-      ? ([
-          { level: "query", emit: "event" },
-          { level: "error", emit: "stdout" },
-          { level: "warn", emit: "stdout" },
-        ] as const)
-      : ([{ level: "error", emit: "stdout" }] as const),
+      ? [
+        { level: "query" as const, emit: "event" as const },
+        { level: "error" as const, emit: "stdout" as const },
+        { level: "warn" as const, emit: "stdout" as const },
+      ]
+      : [{ level: "error" as const, emit: "stdout" as const }],
 };
 
 // ============================================

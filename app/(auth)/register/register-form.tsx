@@ -15,7 +15,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+// Link import removed because it's unused
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -185,16 +185,16 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
     strength === 0
       ? ""
       : strength <= 2
-      ? "Weak"
-      : strength === 3
-      ? "Good"
-      : "Strong";
+        ? "Weak"
+        : strength === 3
+          ? "Good"
+          : "Strong";
   const strengthColor =
     strength <= 2
       ? "bg-red-500"
       : strength === 3
-      ? "bg-amber-500"
-      : "bg-green-500";
+        ? "bg-amber-500"
+        : "bg-green-500";
 
   if (!password) return null;
 
@@ -214,8 +214,8 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
             strength <= 2
               ? "text-red-500"
               : strength === 3
-              ? "text-amber-500"
-              : "text-green-500"
+                ? "text-amber-500"
+                : "text-green-500"
           )}
         >
           {strengthLabel}
@@ -269,7 +269,7 @@ function StepIndicator({ currentStep, totalSteps, steps }: StepIndicatorProps) {
 
         {/* Step Dots */}
         <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between">
-          {steps.map((step, index) => (
+          {steps.map((_, index) => (
             <div
               key={index}
               className={cn(
@@ -284,8 +284,8 @@ function StepIndicator({ currentStep, totalSteps, steps }: StepIndicatorProps) {
                   index + 1 < currentStep
                     ? "bg-primary border-primary"
                     : index + 1 === currentStep
-                    ? "bg-background border-primary"
-                    : "bg-background border-muted"
+                      ? "bg-background border-primary"
+                      : "bg-background border-muted"
                 )}
               >
                 {index + 1 < currentStep && (
@@ -940,7 +940,7 @@ export function RegisterForm({ preselectedRole }: RegisterFormProps) {
             {...farmerProfileForm.register("state")}
           >
             <option value="">Select</option>
-            {Object.entries(US_STATES).map(([code, name]) => (
+            {Object.entries(US_STATES).map(([code]) => (
               <option key={code} value={code}>
                 {code}
               </option>
@@ -1176,7 +1176,7 @@ export function RegisterForm({ preselectedRole }: RegisterFormProps) {
             {...grocerProfileForm.register("state")}
           >
             <option value="">Select</option>
-            {Object.entries(US_STATES).map(([code, name]) => (
+            {Object.entries(US_STATES).map(([code]) => (
               <option key={code} value={code}>
                 {code}
               </option>

@@ -24,20 +24,17 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Clock,
-  CheckCircle2,
-  XCircle,
   Truck,
 } from "lucide-react";
 
 import { requireFarmer } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { formatCurrency, formatDate, formatRelativeTime } from "@/lib/utils";
-import { OrderStatus, OrderStatusLabels, OrderStatusColors } from "@/types";
+import { formatCurrency } from "@/lib/utils";
+
 
 // Components
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
@@ -314,9 +311,8 @@ function StatsCard({ title, value, description, icon, trend, variant = "default"
           <div className="flex items-center gap-2 mt-1">
             {trend && (
               <span
-                className={`inline-flex items-center text-xs font-medium ${
-                  trend.isPositive ? "text-green-600" : "text-red-600"
-                }`}
+                className={`inline-flex items-center text-xs font-medium ${trend.isPositive ? "text-green-600" : "text-red-600"
+                  }`}
               >
                 {trend.isPositive ? (
                   <ArrowUpRight className="h-3 w-3 mr-0.5" />
@@ -443,20 +439,6 @@ function TopProductsList({ products }: { products: Awaited<ReturnType<typeof get
 // LOADING SKELETONS
 // ============================================
 
-function StatsCardSkeleton() {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-8 w-8 rounded-md" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-8 w-20 mb-2" />
-        <Skeleton className="h-3 w-32" />
-      </CardContent>
-    </Card>
-  );
-}
 
 function RecentOrdersSkeleton() {
   return (
@@ -507,7 +489,7 @@ export default async function FarmerDashboardPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back, {farmer.name.split(" ")[0]}! 👋
+            Welcome back, {(farmer.name ?? "").split(" ")[0] || "Farmer"}! 👋
           </h1>
           <p className="text-muted-foreground">
             Here's what's happening with {stats.farmName} today.

@@ -4,35 +4,15 @@
 
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import localFont from "next/font/local";
+
 import "./globals.css";
 
 // Providers
 import { Providers } from "@/components/providers";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/Toaster";
 import { Toaster as SonnerToaster } from "sonner";
 
-// ============================================
-// FONT CONFIGURATION
-// ============================================
-
-// Geist Sans - Primary font
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-  display: "swap",
-});
-
-// Geist Mono - Code/monospace font
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-  display: "swap",
-});
-
-// Inter - Fallback font
+// Inter - Primary font
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -146,13 +126,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable}`}
+      className={`${inter.variable}`}
     >
       <head>
         {/* Preconnect to external resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
+
         {/* DNS Prefetch for API endpoints */}
         <link rel="dns-prefetch" href="https://api.stripe.com" />
         <link rel="dns-prefetch" href="https://maps.googleapis.com" />
@@ -207,7 +187,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             duration={4000}
             toastOptions={{
               style: {
-                fontFamily: "var(--font-geist-sans)",
+                fontFamily: "var(--font-inter)",
               },
             }}
           />

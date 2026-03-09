@@ -15,14 +15,22 @@ import prisma, {
   getPrismaErrorMessage,
 } from "@/lib/prisma";
 import { getSession, requireFarmer } from "@/lib/auth";
-import {
-  ProductCategory,
-  ProductUnit,
-  ProductStatus,
-  type ApiResponse,
-  type Product,
-  type ProductWithFarmer,
+import type {
+  ApiResponse,
+  ProductWithFarmer,
 } from "@/types";
+import { Product, ProductStatus } from "@prisma/client";
+
+export type ProductWithDetails = Product & {
+  farmer: {
+    user: {
+      name: string | null;
+      email: string | null;
+      phone: string | null;
+      image: string | null;
+    };
+  };
+};
 
 // ============================================
 // ROUTE CONTEXT TYPE
@@ -53,14 +61,42 @@ const updateProductSchema = z.object({
     .optional()
     .nullable(),
   category: z
-    .nativeEnum(ProductCategory, {
-      errorMap: () => ({ message: "Invalid product category" }),
-    })
+    .enum(
+      [
+        "VEGETABLES",
+        "FRUITS",
+        "DAIRY",
+        "MEAT",
+        "POULTRY",
+        "GRAINS",
+        "HERBS",
+        "EGGS",
+        "HONEY",
+        "OTHER",
+      ],
+      {
+        errorMap: () => ({ message: "Invalid product category" }),
+      }
+    )
     .optional(),
   unit: z
-    .nativeEnum(ProductUnit, {
-      errorMap: () => ({ message: "Invalid product unit" }),
-    })
+    .enum(
+      [
+        "LB",
+        "KG",
+        "OZ",
+        "BUNCH",
+        "DOZEN",
+        "GALLON",
+        "LITER",
+        "PIECE",
+        "CASE",
+        "PALLET",
+      ],
+      {
+        errorMap: () => ({ message: "Invalid product unit" }),
+      }
+    )
     .optional(),
   pricePerUnit: z
     .number()
@@ -108,6 +144,18 @@ const updateProductSchema = z.object({
     .nativeEnum(ProductStatus, {
       errorMap: () => ({ message: "Invalid product status" }),
     })
+    .refine(
+      (val) => {
+        const allowedStatuses: Record<string, string> = {
+          DRAFT: "DRAFT",
+          ACTIVE: "ACTIVE",
+          OUT_OF_STOCK: "OUT_OF_STOCK",
+          DISCONTINUED: "DISCONTINUED",
+        };
+        return val ? allowedStatuses[val] !== undefined : true;
+      },
+      { message: "Invalid product status for update" }
+    )
     .optional(),
 });
 
@@ -188,7 +236,7 @@ function createErrorResponse(
 // ============================================
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: RouteContext
 ): Promise<NextResponse<ApiResponse<ProductWithFarmer>>> {
   try {
@@ -238,7 +286,7 @@ export async function GET(
     const session = await getSession();
     const isOwner = session?.user?.farmerId === product.farmerId;
 
-    if (product.status !== ProductStatus.ACTIVE && !isOwner) {
+    if (product.status !== "ACTIVE" && !isOwner) {
       return createErrorResponse(
         "Product not found",
         "NOT_FOUND",
@@ -246,15 +294,7 @@ export async function GET(
       );
     }
 
-    // Increment view count (optional - fire and forget)
-    prisma.product
-      .update({
-        where: { id },
-        data: { viewCount: { increment: 1 } },
-      })
-      .catch(() => {
-        // Silently fail - view count is not critical
-      });
+    // View count tracking removed - field does not exist in schema
 
     return createResponse(product as ProductWithFarmer);
   } catch (error) {
@@ -582,6 +622,7 @@ export async function DELETE(
         id: true,
         farmerId: true,
         name: true,
+        description: true,
         _count: {
           select: {
             orderItems: {
@@ -641,7 +682,7 @@ export async function DELETE(
       await prisma.product.update({
         where: { id },
         data: {
-          status: ProductStatus.ARCHIVED,
+          status: "DISCONTINUED" as ProductStatus,
           updatedAt: new Date(),
         },
       });
@@ -687,7 +728,7 @@ export async function DELETE(
 // CORS preflight handler
 // ============================================
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new NextResponse(null, {
     status: 204,
     headers: {

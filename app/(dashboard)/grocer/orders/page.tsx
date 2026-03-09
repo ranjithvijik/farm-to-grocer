@@ -10,12 +10,10 @@
 // - Reorder functionality
 // - Mobile-responsive card view
 
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Search,
-  Filter,
   Package,
   ShoppingCart,
   Clock,
@@ -31,10 +29,8 @@ import {
   ChevronsRight,
   ArrowUpDown,
   Download,
-  Calendar,
   MapPin,
   Star,
-  AlertCircle,
   X,
 } from "lucide-react";
 
@@ -45,8 +41,7 @@ import { OrderStatus, PaymentStatus, OrderStatusLabels } from "@/types";
 
 // Components
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Skeleton } from "@/components/ui/Skeleton";
+
 
 // ============================================
 // METADATA
@@ -301,11 +296,10 @@ function Filters({ searchParams, statusCounts }: FiltersProps) {
               status: tab.value,
               page: "1",
             } as any).toString()}`}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
-              status === tab.value
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${status === tab.value
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             {tab.label}
             <span className="ml-1.5 text-xs text-muted-foreground">({tab.count})</span>
@@ -708,11 +702,10 @@ function Pagination({ pagination, searchParams }: PaginationProps) {
               <Link
                 key={page}
                 href={createPageUrl(page)}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  page === currentPage
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-accent"
-                }`}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${page === currentPage
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-accent"
+                  }`}
               >
                 {page}
               </Link>
@@ -765,94 +758,7 @@ function Pagination({ pagination, searchParams }: PaginationProps) {
   );
 }
 
-// ============================================
-// LOADING SKELETON
-// ============================================
 
-function OrdersLoadingSkeleton() {
-  return (
-    <div className="rounded-lg border bg-card overflow-hidden">
-      {/* Desktop Table */}
-      <div className="hidden md:block">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b bg-muted/50">
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Order</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Farmer</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Payment</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Total</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Date</th>
-              <th className="w-20 px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <tr key={i} className="border-b">
-                <td className="px-4 py-4">
-                  <div className="flex items-center gap-3">
-                    <Skeleton className="h-12 w-12 rounded-lg" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-28" />
-                      <Skeleton className="h-3 w-16" />
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-4">
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </td>
-                <td className="px-4 py-4">
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                </td>
-                <td className="px-4 py-4">
-                  <Skeleton className="h-5 w-16 rounded-full" />
-                </td>
-                <td className="px-4 py-4">
-                  <Skeleton className="h-4 w-20" />
-                </td>
-                <td className="px-4 py-4">
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                </td>
-                <td className="px-4 py-4">
-                  <Skeleton className="h-8 w-16" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="md:hidden divide-y">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="p-4 space-y-3">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-12 w-12 rounded-lg" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-28" />
-                <Skeleton className="h-3 w-20" />
-              </div>
-            </div>
-            <div className="flex justify-between">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-16" />
-            </div>
-            <div className="flex gap-2">
-              <Skeleton className="h-9 flex-1" />
-              <Skeleton className="h-9 flex-1" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 // ============================================
 // EMPTY STATE

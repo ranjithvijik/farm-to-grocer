@@ -10,6 +10,8 @@
 // - Legal links and copyright
 // - Responsive design
 
+"use client";
+
 import * as React from "react";
 import Link from "next/link";
 import {
@@ -346,14 +348,14 @@ function FullFooterContent() {
                     "text-sm text-muted-foreground hover:text-foreground transition-colors",
                     "inline-flex items-center gap-1"
                   )}
-                  {...(link.external && {
+                  {...('external' in link && link.external && {
                     target: "_blank",
                     rel: "noopener noreferrer",
                   })}
                 >
                   {link.label}
-                  {link.external && <ExternalLink className="h-3 w-3" />}
-                  {link.badge && (
+                  {'external' in link && link.external && <ExternalLink className="h-3 w-3" />}
+                  {'badge' in link && link.badge && (
                     <span className="ml-1 px-1.5 py-0.5 text-xs font-medium rounded bg-primary/10 text-primary">
                       {link.badge}
                     </span>
