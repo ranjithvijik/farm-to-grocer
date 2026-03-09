@@ -1,8 +1,5 @@
-// Farm-to-Grocer MVP - Root Layout
-// Path: app/layout.tsx
-
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 
 import "./globals.css";
 
@@ -11,7 +8,22 @@ import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/Toaster";
 import { Toaster as SonnerToaster } from "sonner";
 
-// Inter - Primary font
+// Playfair Display - Elegant serif for headings
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+// Plus Jakarta Sans - Modern body font
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+// Inter - Utility/mono contexts
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -140,11 +152,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
         className={`
           min-h-screen 
           bg-background 
-          font-sans 
           antialiased
           selection:bg-primary/20
           selection:text-primary
+          ${playfair.variable}
+          ${jakarta.variable}
+          ${inter.variable}
         `}
+        style={{ fontFamily: 'var(--font-jakarta), var(--font-inter), sans-serif' }}
       >
         {/* Skip to main content - Accessibility */}
         <a
