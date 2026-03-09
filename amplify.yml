@@ -1,16 +1,42 @@
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 # FARM-TO-GROCER MVP - AWS AMPLIFY BUILD SPECIFICATION
-# This configures CI/CD for Next.js 14 SSR on AWS Amplify.
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+#
+# This amplify.yml configures the CI/CD pipeline for deploying
+# a Next.js 14 SSR application to AWS Amplify Hosting.
+#
+# Documentation: https://docs.aws.amazon.com/amplify/latest/userguide/
+#
+# Features:
+# - Next.js 14 App Router with SSR support
+# - Prisma database migrations
+# - Environment variable injection
+# - Build caching for faster deployments
+# - Preview deployments for pull requests
+#
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 version: 1
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# APPLICATIONS (Frontend + Backend)
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 applications:
   - appRoot: .
     frontend:
+      # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+      # BUILD PHASES
+      # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
       phases:
+        # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+        # PRE-BUILD: Install dependencies & setup
+        # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
         preBuild:
           commands:
-            - 'echo "Node.js version:" && node --version'
-            - 'echo "npm version:" && npm --version'
+            # Display Node.js and npm versions for debugging
+            - echo "Node.js version:" && node --version
+            - echo "npm version:" && npm --version
             
             # --- BACKEND CONNECTIVITY VALIDATION ---
             - |
@@ -19,8 +45,12 @@ applications:
               if [ -z "$NEXTAUTH_SECRET" ]; then echo "ERROR: NEXTAUTH_SECRET is not set" && exit 1; fi
               echo "Required environment variables are present."
 
-            - 'npm ci --legacy-peer-deps'
-            - 'npx prisma generate'
+            # Install dependencies
+            # Using --legacy-peer-deps to resolve next-auth/nodemailer version conflicts
+            - npm ci --legacy-peer-deps
+            
+            # Generate Prisma client
+            - npx prisma generate
             
             # --- DATABASE MIGRATIONS & SEEDING ---
             - |
@@ -34,7 +64,7 @@ applications:
                 if npx prisma migrate deploy; then
                   echo "✅ Migrations completed successfully."
                 else
-                  echo "❌ Migrations failed. Check credentials."
+                  echo "❌ Migrations failed. Check credentials/SSL settings."
                   exit 1
                 fi
                 
@@ -48,12 +78,19 @@ applications:
                   fi
                 fi
               else
-                echo "Skipping production-level database tasks for branch $AWS_BRANCH"
+                echo "Skipping production-level database tasks for branch: $AWS_BRANCH"
               fi
+
+        # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+        # BUILD: Compile the application
+        # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
         build:
           commands:
-            - 'echo "Building Farm-to-Grocer for branch $AWS_BRANCH"'
-            - 'echo "Commit: $AWS_COMMIT_ID"'
+            # Display build information
+            - echo "Building Farm-to-Grocer for branch: $AWS_BRANCH"
+            - echo "Commit: $AWS_COMMIT_ID"
+            
+            # Set environment-specific variables
             - |
               if [ "$AWS_BRANCH" = "main" ] || [ "$AWS_BRANCH" = "production" ]; then
                 export NODE_ENV=production
@@ -62,22 +99,61 @@ applications:
                 export NODE_ENV=development
                 echo "Building for PREVIEW/DEVELOPMENT"
               fi
-            - 'npm run build'
-            - 'echo "Build completed successfully!"'
+            
+            # Run Next.js build
+            - npm run build
+            
+            # Display build completion
+            - echo "Build completed successfully!"
+
+        # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+        # POST-BUILD: Cleanup & verification (optional)
+        # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
         postBuild:
           commands:
-            - 'echo "Post-build phase complete"'
+            - echo "Post-build phase complete"
+
+      # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+      # BUILD ARTIFACTS
+      # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
       artifacts:
+        # Base directory for Next.js SSR output
+        # IMPORTANT: Must be .next for SSR applications
         baseDirectory: .next
+        
+        # Files to include in deployment
         files:
           - '**/*'
+
+      # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+      # BUILD CACHE
+      # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+      # Caching significantly speeds up subsequent builds
       cache:
         paths:
-          - 'node_modules/**/*'
-          - '.next/cache/**/*'
-          - 'node_modules/.prisma/**/*'
-          - '~/.npm/**/*'
+          # Cache node_modules to speed up npm ci
+          - node_modules/**/*
+          
+          # Cache Next.js build cache
+          - .next/cache/**/*
+          
+          # Cache Prisma client
+          - node_modules/.prisma/**/*
+          
+          # Cache npm cache directory
+          - ~/.npm/**/*
 
+      # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+      # BUILD SETTINGS
+      # âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+      buildSettings:
+        # Build timeout in minutes (default: 30)
+        # Increase for larger projects
+        buildTimeout: 30
+
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# CUSTOM HEADERS (Optional)
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 customHeaders:
   - pattern: '**/*'
     headers:
@@ -91,22 +167,34 @@ customHeaders:
         value: '1; mode=block'
       - key: 'Referrer-Policy'
         value: 'strict-origin-when-cross-origin'
+
+  # Cache static assets
   - pattern: '/_next/static/**/*'
     headers:
       - key: 'Cache-Control'
         value: 'public, max-age=31536000, immutable'
+
+  # Cache images
   - pattern: '/images/**/*'
     headers:
       - key: 'Cache-Control'
         value: 'public, max-age=86400'
 
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# REDIRECTS & REWRITES
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 customRules:
+  # Handle 404 errors - redirect to custom 404 page
   - source: '/<*>'
     target: '/index.html'
     status: '404-200'
+
+  # API routes should not be rewritten
   - source: '/api/<*>'
     target: '/api/<*>'
     status: '200'
+
+  # Static files
   - source: '/_next/<*>'
     target: '/_next/<*>'
     status: '200'
