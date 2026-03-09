@@ -181,8 +181,8 @@ $RECYCLE.BIN/
 # PACKAGE MANAGERS
 # ───────────────────────────────────────────────────────────────
 
-# npm
-package-lock.json
+# package-lock.json
+# package-lock.json  # Removed so Amplify can use npm ci
 
 # Yarn
 # yarn.lock  # Uncomment if using pnpm
