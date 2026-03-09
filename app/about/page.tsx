@@ -6,10 +6,7 @@ import { Footer } from "@/components/Footer";
 import {
     Heart,
     Target,
-    ShieldCheck,
     Globe,
-    Users,
-    Clock,
     ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -26,7 +23,7 @@ export default function AboutPage() {
                 <section className="relative h-[400px] flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
                         <img
-                            src="/images/about-hero.jpg"
+                            src="/images/about-hero.png"
                             alt="Local farm landscape"
                             className="w-full h-full object-cover brightness-50"
                         />
@@ -68,8 +65,8 @@ export default function AboutPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-4">
-                                    <img src="/images/about-1.jpg" alt="Local marketplace" className="rounded-2xl shadow-lg w-full h-48 object-cover translate-y-8" />
-                                    <img src="/images/about-2.jpg" alt="Fresh harvest" className="rounded-2xl shadow-lg w-full h-64 object-cover" />
+                                    <img src="/images/about-1.png" alt="Local marketplace" className="rounded-2xl shadow-lg w-full h-48 object-cover translate-y-8" />
+                                    <img src="/images/about-2.png" alt="Fresh harvest" className="rounded-2xl shadow-lg w-full h-64 object-cover" />
                                 </div>
                                 <div className="space-y-4">
                                     <img src="/images/about-3.jpg" alt="Farmer hands" className="rounded-2xl shadow-lg w-full h-64 object-cover" />

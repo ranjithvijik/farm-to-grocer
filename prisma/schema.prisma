@@ -108,9 +108,17 @@ model Farmer {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  products    Product[]
-  orders      Order[]   @relation("FarmerOrders")
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products       Product[]
+  orders         Order[]       @relation("FarmerOrders")
+  connections    Connection[]  @relation("FarmerConnections")
+
+  // Additional fields from external repo
+  phone          String?
+  deliveryDays   String[]
+  leadTimeDays   Int?          @default(2)
+  minimumOrderAmount Float?    @default(0)
+  story          String?       @db.Text
 
   @@index([city, state])
   @@index([isVerified])
@@ -157,6 +165,7 @@ model Product {
   category        ProductCategory
   unit            ProductUnit
   pricePerUnit    Float
+  packSize        String          @default("1 unit")
   minOrderQty     Int             @default(1)
   maxOrderQty     Int?
   availableQty    Int
@@ -207,6 +216,14 @@ model Grocer {
   orders        Order[]    @relation("GrocerOrders")
   cartItems     CartItem[]
   savedFarmers  SavedFarmer[]
+  connections   Connection[] @relation("GrocerConnections")
+
+  // Additional fields from external repo
+  phone                 String?
+  receivingAddress      String?
+  receivingDays         String[]
+  preferredDeliveryDays String[]
+  categoriesOfInterest  String[]
 
   @@index([city, state])
   @@index([isVerified])
@@ -237,6 +254,35 @@ model SavedFarmer {
   grocer    Grocer   @relation(fields: [grocerId], references: [id], onDelete: Cascade)
 
   @@unique([grocerId, farmerId])
+}
+
+// ============================================
+// B2B CONNECTIONS
+// ============================================
+
+enum ConnectionStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
+
+model Connection {
+  id          String           @id @default(cuid())
+  farmerId    String
+  grocerId    String
+  status      ConnectionStatus @default(PENDING)
+  requestedAt DateTime         @default(now())
+  approvedAt  DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  farmer      Farmer           @relation("FarmerConnections", fields: [farmerId], references: [id], onDelete: Cascade)
+  grocer      Grocer           @relation("GrocerConnections", fields: [grocerId], references: [id], onDelete: Cascade)
+
+  @@unique([farmerId, grocerId])
+  @@index([farmerId])
+  @@index([grocerId])
+  @@index([status])
 }
 
 // ============================================

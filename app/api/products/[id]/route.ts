@@ -102,6 +102,11 @@ const updateProductSchema = z.object({
     .positive("Price must be greater than 0")
     .max(999999.99, "Price exceeds maximum allowed")
     .optional(),
+  packSize: z
+    .string()
+    .min(1, "Pack size is required")
+    .max(50, "Pack size must be less than 50 characters")
+    .optional(),
   minOrderQty: z
     .number()
     .int()

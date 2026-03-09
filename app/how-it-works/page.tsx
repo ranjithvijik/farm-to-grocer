@@ -90,7 +90,7 @@ export default function HowItWorksPage() {
                             <div className="flex-1">
                                 <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
                                     <img
-                                        src="/images/grocer-buying.jpg"
+                                        src="/images/grocer-buying.png"
                                         alt="Grocer browsing fresh produce"
                                         className="object-cover w-full h-full"
                                     />
@@ -152,7 +152,7 @@ export default function HowItWorksPage() {
                             <div className="flex-1">
                                 <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
                                     <img
-                                        src="/images/farmer-harvest.jpg"
+                                        src="/images/farmer-harvest.png"
                                         alt="Farmer preparing a delivery"
                                         className="object-cover w-full h-full"
                                     />

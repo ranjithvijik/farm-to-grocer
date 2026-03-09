@@ -14,6 +14,7 @@ import {
   PaymentStatus,
   DeliveryMethod,
   NotificationType,
+  ConnectionStatus,
 } from "@prisma/client";
 
 // ============================================
@@ -30,6 +31,7 @@ export {
   PaymentStatus,
   DeliveryMethod,
   NotificationType,
+  ConnectionStatus,
 };
 
 // ============================================
@@ -219,6 +221,13 @@ export interface Farmer {
   isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
+
+  // New fields
+  phone: string | null;
+  deliveryDays: string[];
+  leadTimeDays: number | null;
+  minimumOrderAmount: number | null;
+  story: string | null;
 }
 
 /**
@@ -306,6 +315,13 @@ export interface Grocer {
   totalOrders: number;
   createdAt: Date;
   updatedAt: Date;
+
+  // New fields
+  phone: string | null;
+  receivingAddress: string | null;
+  receivingDays: string[];
+  preferredDeliveryDays: string[];
+  categoriesOfInterest: string[];
 }
 
 /**
@@ -346,6 +362,7 @@ export interface Product {
   category: ProductCategory;
   unit: ProductUnit;
   pricePerUnit: number;
+  packSize: string;
   minOrderQty: number;
   maxOrderQty: number | null;
   availableQty: number;
@@ -386,6 +403,7 @@ export interface ProductCard {
   farmName: string;
   farmerCity: string;
   farmerState: string;
+  packSize: string;
 }
 
 /**
@@ -432,6 +450,32 @@ export interface ProductSearchParams {
   limit?: number;
   sortBy?: "pricePerUnit" | "createdAt" | "name" | "availableQty";
   sortOrder?: "asc" | "desc";
+}
+
+// ============================================
+// B2B CONNECTION TYPES
+// ============================================
+
+/**
+ * B2B Connection
+ */
+export interface Connection {
+  id: string;
+  farmerId: string;
+  grocerId: string;
+  status: ConnectionStatus;
+  requestedAt: Date;
+  approvedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Connection with related profiles
+ */
+export interface ConnectionWithProfiles extends Connection {
+  farmer: Farmer;
+  grocer: Grocer;
 }
 
 // ============================================

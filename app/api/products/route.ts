@@ -81,6 +81,11 @@ const createProductSchema = z.object({
     .number()
     .positive("Price must be greater than 0")
     .max(999999.99, "Price exceeds maximum allowed"),
+  packSize: z
+    .string()
+    .min(1, "Pack size is required")
+    .max(50, "Pack size must be less than 50 characters")
+    .default("1 unit"),
   minOrderQty: z
     .number()
     .int()
@@ -434,6 +439,7 @@ export async function POST(
         category: data.category,
         unit: data.unit,
         pricePerUnit: data.pricePerUnit,
+        packSize: data.packSize,
         minOrderQty: data.minOrderQty,
         maxOrderQty: data.maxOrderQty,
         availableQty: data.availableQty,

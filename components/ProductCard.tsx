@@ -75,6 +75,7 @@ export interface ProductCardProduct {
   category: ProductCategory;
   unit: ProductUnit;
   pricePerUnit: number;
+  packSize: string;
   minOrderQty: number;
   maxOrderQty?: number | null;
   availableQty: number;
@@ -407,7 +408,7 @@ export function ProductCard({
             {formatCurrency(product.pricePerUnit)}
           </span>
           <span className="text-sm text-muted-foreground ml-1">
-            / {ProductUnitLabels[product.unit]}
+            / {ProductUnitLabels[product.unit]} ({product.packSize})
           </span>
         </div>
 
@@ -645,7 +646,7 @@ function ListProductCard({
               {formatCurrency(product.pricePerUnit)}
             </span>
             <span className="text-sm text-muted-foreground ml-1">
-              / {ProductUnitLabels[product.unit]}
+              / {ProductUnitLabels[product.unit]} ({product.packSize})
             </span>
           </div>
 
@@ -765,7 +766,7 @@ function CompactProductCard({
           {product.farmer?.farmName}
         </p>
         <p className="text-sm font-semibold text-primary mt-0.5">
-          {formatCurrency(product.pricePerUnit)}/{ProductUnitLabels[product.unit]}
+          {formatCurrency(product.pricePerUnit)}/{ProductUnitLabels[product.unit]} ({product.packSize})
         </p>
       </div>
 

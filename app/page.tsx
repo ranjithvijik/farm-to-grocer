@@ -128,7 +128,7 @@ export default function HomePage() {
               <div className="relative">
                 <div className="relative aspect-square lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/hero-farm.jpg"
+                    src="/images/hero-farm.png"
                     alt="Fresh produce from local farms"
                     fill
                     className="object-cover"
