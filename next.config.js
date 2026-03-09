@@ -365,7 +365,7 @@ const nextConfig = {
   // ============================================
   // OUTPUT CONFIGURATION
   // ============================================
-  // output: "standalone", // Uncomment for Docker deployments
+  output: "standalone", // Uncomment for Docker deployments
 
   // ============================================
   // POWERED BY HEADER
