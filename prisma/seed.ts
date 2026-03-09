@@ -194,7 +194,7 @@ async function main() {
                     pricePerUnit: 42.0,
                     availableQty: 50,
                     isOrganic: false,
-                    images: ['/images/hero/Hero-1.jpg'],
+                    images: ['https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&q=80'],
                 },
                 {
                     farmerId: farmer1.id,
@@ -206,7 +206,7 @@ async function main() {
                     pricePerUnit: 48.0,
                     availableQty: 30,
                     isOrganic: false,
-                    images: ['/images/hero/Hero-5.jpg'],
+                    images: ['https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=800&q=80'],
                 },
                 {
                     farmerId: farmer1.id,
@@ -218,7 +218,7 @@ async function main() {
                     pricePerUnit: 28.0,
                     availableQty: 25,
                     isOrganic: true,
-                    images: ['/images/hero/Hero-1.jpg'],
+                    images: ['https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80'],
                 },
             ],
         });
@@ -236,7 +236,7 @@ async function main() {
                     pricePerUnit: 16.0,
                     availableQty: 40,
                     isOrganic: true,
-                    images: ['/images/hero/Hero-1.jpg'],
+                    images: ['https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&q=80'],
                 },
                 {
                     farmerId: farmer3.id,
@@ -248,7 +248,7 @@ async function main() {
                     pricePerUnit: 24.0,
                     availableQty: 20,
                     isOrganic: true,
-                    images: ['/images/hero/Hero-5.jpg'],
+                    images: ['https://images.unsplash.com/photo-1556910103-1c02745aec5e?w=800&q=80'],
                 },
             ],
         });
@@ -266,7 +266,7 @@ async function main() {
                     pricePerUnit: 18.0,
                     availableQty: 35,
                     isOrganic: true,
-                    images: ['/images/hero/Hero-1.jpg'],
+                    images: ['https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=800&q=80'],
                 },
                 {
                     farmerId: farmer2.id,
@@ -278,7 +278,7 @@ async function main() {
                     pricePerUnit: 6.5,
                     availableQty: 100,
                     isOrganic: true,
-                    images: ['/images/hero/Hero-5.jpg'],
+                    images: ['https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=800&q=80'],
                 },
             ],
         });

@@ -28,18 +28,18 @@
     /* ─────────────────────────────────────────
        CORE COLORS (HSL format for opacity support)
        ───────────────────────────────────────── */
-    
-    /* Background & Foreground */
-    --background: 0 0% 100%;
-    --foreground: 142 20% 10%;
+
+    /* Background & Foreground — warm cream palette */
+    --background: 42 50% 96%;
+    --foreground: 30 15% 10%;
 
     /* Card */
     --card: 0 0% 100%;
-    --card-foreground: 142 20% 10%;
+    --card-foreground: 30 15% 10%;
 
     /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 142 20% 10%;
+    --popover-foreground: 30 15% 10%;
 
     /* Primary - Farm Green */
     --primary: 142 71% 45%;
@@ -95,67 +95,7 @@
     --chart-5: 0 84% 60%;
   }
 
-  /* ============================================
-     CSS CUSTOM PROPERTIES - DARK THEME
-     ============================================ */
-
-  .dark {
-    /* Background & Foreground */
-    --background: 142 20% 6%;
-    --foreground: 142 10% 95%;
-
-    /* Card */
-    --card: 142 20% 8%;
-    --card-foreground: 142 10% 95%;
-
-    /* Popover */
-    --popover: 142 20% 8%;
-    --popover-foreground: 142 10% 95%;
-
-    /* Primary - Farm Green (slightly brighter for dark mode) */
-    --primary: 142 71% 50%;
-    --primary-foreground: 142 20% 6%;
-
-    /* Secondary */
-    --secondary: 142 15% 15%;
-    --secondary-foreground: 142 10% 90%;
-
-    /* Muted */
-    --muted: 142 15% 15%;
-    --muted-foreground: 142 10% 60%;
-
-    /* Accent */
-    --accent: 142 20% 15%;
-    --accent-foreground: 142 10% 95%;
-
-    /* Destructive */
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* Border & Input */
-    --border: 142 15% 18%;
-    --input: 142 15% 18%;
-
-    /* Ring */
-    --ring: 142 71% 50%;
-
-    /* Sidebar */
-    --sidebar-background: 142 20% 5%;
-    --sidebar-foreground: 142 10% 90%;
-    --sidebar-primary: 142 71% 50%;
-    --sidebar-primary-foreground: 142 20% 6%;
-    --sidebar-accent: 142 20% 12%;
-    --sidebar-accent-foreground: 142 10% 95%;
-    --sidebar-border: 142 15% 15%;
-    --sidebar-ring: 142 71% 50%;
-
-    /* Chart Colors (adjusted for dark mode) */
-    --chart-1: 142 71% 55%;
-    --chart-2: 45 93% 55%;
-    --chart-3: 217 91% 65%;
-    --chart-4: 262 83% 65%;
-    --chart-5: 0 84% 65%;
-  }
+  /* Dark mode intentionally disabled — app uses light cream theme */
 }
 
 /* ============================================
@@ -163,6 +103,7 @@
    ============================================ */
 
 @layer base {
+
   /* Global box-sizing */
   *,
   *::before,
@@ -381,12 +322,12 @@
 
   .glass {
     @apply bg-background/70 backdrop-blur-xl;
-    @apply border border-border/40 shadow-[0_4px_30px_rgba(0,0,0,0.05)];
+    @apply border border-border/40 shadow-[0_4px_30px_rgba(0, 0, 0, 0.05)];
   }
 
   .glass-dark {
     @apply bg-background/50 backdrop-blur-2xl;
-    @apply border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)];
+    @apply border border-white/10 shadow-[0_4px_30px_rgba(0, 0, 0, 0.1)];
   }
 
   /* ─────────────────────────────────────────
@@ -672,7 +613,7 @@
 
   .border-gradient {
     border: 1px solid transparent;
-    background: 
+    background:
       linear-gradient(var(--background), var(--background)) padding-box,
       linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.3)) border-box;
   }
@@ -696,22 +637,25 @@
   /* ─────────────────────────────────────────
      DECORATIVE BACKGROUNDS & EFFECTS
      ───────────────────────────────────────── */
-  
+
   .bg-grid-pattern {
-    background-image: 
+    background-image:
       linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
       linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px);
     background-size: 40px 40px;
-    opacity: 0.03; /* Very faint grid */
+    opacity: 0.03;
+    /* Very faint grid */
   }
 
   .nav-link-animated {
     @apply relative overflow-hidden;
   }
+
   .nav-link-animated::after {
     content: '';
     @apply absolute bottom-0 left-0 w-full h-[2px] bg-primary scale-x-0 origin-right transition-transform duration-300 ease-out;
   }
+
   .nav-link-animated:hover::after,
   .nav-link-animated.active::after {
     @apply scale-x-100 origin-left;
@@ -753,6 +697,7 @@
    ============================================ */
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
