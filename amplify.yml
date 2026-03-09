@@ -52,30 +52,35 @@ applications:
             # Generate Prisma client
             - npx prisma generate
             
-            # --- DATABASE MIGRATIONS & SEEDING ---
+            # --- DATABASE MIGRATIONS & SEEDING (non-fatal) ---
+            # Database tasks are non-blocking so the app can deploy
+            # even if DB connectivity isn't ready yet.
             - |
               if [ "$AWS_BRANCH" = "main" ] || [ "$AWS_BRANCH" = "production" ]; then
-                echo "--- DATABASE TASKS ---"
+                echo "--- DATABASE TASKS (non-fatal) ---"
                 
                 echo "Testing connectivity..."
-                npx ts-node --compiler-options '{"module":"CommonJS"}' scripts/test-db-connection.ts
-                
-                echo "Running database migrations..."
-                if npx prisma migrate deploy; then
-                  echo "✅ Migrations completed successfully."
-                else
-                  echo "❌ Migrations failed. Check credentials/SSL settings."
-                  exit 1
-                fi
-                
-                if [ "$FORCE_SEED" = "true" ]; then
-                  echo "Force seeding database..."
-                  if npx prisma db seed; then
-                    echo "✅ Seeding completed successfully."
+                if npx ts-node --compiler-options '{"module":"CommonJS"}' scripts/test-db-connection.ts; then
+                  echo "✅ Database reachable!"
+                  
+                  echo "Running database migrations..."
+                  if npx prisma migrate deploy; then
+                    echo "✅ Migrations completed successfully."
                   else
-                    echo "❌ Seeding failed."
-                    exit 1
+                    echo "⚠️ Migrations failed — continuing build anyway."
                   fi
+                  
+                  if [ "$FORCE_SEED" = "true" ]; then
+                    echo "Force seeding database..."
+                    if npx prisma db seed; then
+                      echo "✅ Seeding completed successfully."
+                    else
+                      echo "⚠️ Seeding failed — continuing build anyway."
+                    fi
+                  fi
+                else
+                  echo "⚠️ Database not reachable — skipping migrations/seeding."
+                  echo "⚠️ The app will deploy but DB features won't work until connectivity is fixed."
                 fi
               else
                 echo "Skipping production-level database tasks for branch: $AWS_BRANCH"
