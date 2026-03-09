@@ -121,11 +121,14 @@ export function Footer({
   return (
     <footer
       className={cn(
-        "bg-muted/30 border-t",
+        "bg-background border-t border-border/50 relative overflow-hidden",
         className
       )}
       role="contentinfo"
     >
+      {/* Decorative background glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+
       {/* Newsletter Section */}
       {showNewsletter && !minimal && (
         <div className="border-b">
@@ -344,8 +347,8 @@ function FullFooterContent() {
                 <Link
                   href={link.href}
                   className={cn(
-                    "text-sm text-muted-foreground hover:text-foreground transition-colors",
-                    "inline-flex items-center gap-1"
+                    "text-sm text-muted-foreground hover:text-primary transition-colors",
+                    "inline-flex items-center gap-1 nav-link-animated"
                   )}
                   {...('external' in link && link.external && {
                     target: "_blank",

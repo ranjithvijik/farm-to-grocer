@@ -31,9 +31,9 @@ const cardVariants = cva(
       variant: {
         // Default card with subtle background
         default: [
-          "bg-card",
-          "border-border",
-          "shadow-sm",
+          "glass",
+          "border-border/50",
+          "shadow-[0_4px_30px_rgba(0,0,0,0.05)]",
         ],
 
         // Outline only, no background
@@ -58,15 +58,17 @@ const cardVariants = cva(
 
         // Interactive - for clickable cards
         interactive: [
-          "bg-card",
-          "border-border",
-          "shadow-sm",
+          "glass",
+          "border-border/50",
+          "shadow-[0_4px_30px_rgba(0,0,0,0.05)]",
           "cursor-pointer",
-          "hover:shadow-md",
-          "hover:border-primary/30",
-          "hover:-translate-y-0.5",
-          "active:scale-[0.99]",
+          "hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]",
+          "hover:border-primary/50",
+          "hover:-translate-y-1",
+          "active:scale-[0.98]",
           "active:shadow-sm",
+          "transition-all",
+          "duration-300"
         ],
 
         // Destructive - for warning/error cards

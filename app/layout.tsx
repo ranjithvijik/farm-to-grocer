@@ -171,8 +171,15 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
         {/* All Providers Wrapper */}
         <Providers>
+          {/* Ambient Background Effects for Modern Theme */}
+          <div className="fixed inset-0 z-[-1] bg-background">
+            <div className="absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(to_bottom,white,transparent)]" />
+            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[800px] h-[400px] opacity-30 blur-[100px] bg-primary/20 rounded-full pointer-events-none" />
+            <div className="absolute right-0 bottom-0 w-[500px] h-[500px] opacity-20 blur-[120px] bg-harvest-500/20 rounded-full pointer-events-none" />
+          </div>
+
           {/* Main Content */}
-          <div id="main-content" className="relative flex min-h-screen flex-col">
+          <div id="main-content" className="relative flex min-h-screen flex-col isolate">
             {children}
           </div>
 

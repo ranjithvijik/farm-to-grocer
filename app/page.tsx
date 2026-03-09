@@ -135,7 +135,7 @@ export default function HomePage() {
                     priority
                   />
                   {/* Overlay Card */}
-                  <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-64 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
+                  <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-64 glass rounded-xl p-4">
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
                         <TrendingUp className="h-6 w-6 text-green-600" />
@@ -161,7 +161,7 @@ export default function HomePage() {
         {/* ════════════════════════════════════════════════════════════
             STATS SECTION
         ════════════════════════════════════════════════════════════ */}
-        <section className="border-y bg-muted/30">
+        <section className="border-y border-border/50 bg-background/40 backdrop-blur-md relative">
           <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
               {[
@@ -244,7 +244,7 @@ export default function HomePage() {
                   color: "text-rose-600 bg-rose-100 dark:bg-rose-900/50",
                 },
               ].map((feature, index) => (
-                <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+                <Card key={index} variant="interactive" className="glass border-border/50 transition-all duration-300 hover:scale-[1.02]">
                   <CardContent className="p-6">
                     <div className={`inline-flex h-12 w-12 items-center justify-center rounded-lg ${feature.color} mb-4`}>
                       <feature.icon className="h-6 w-6" />
@@ -261,7 +261,7 @@ export default function HomePage() {
         {/* ════════════════════════════════════════════════════════════
             HOW IT WORKS SECTION
         ════════════════════════════════════════════════════════════ */}
-        <section className="py-20 lg:py-28 bg-muted/30">
+        <section className="py-20 lg:py-28 relative">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             {/* Section Header */}
             <div className="text-center max-w-3xl mx-auto mb-16">
@@ -439,7 +439,7 @@ export default function HomePage() {
                   type: "farmer",
                 },
               ].map((testimonial, index) => (
-                <Card key={index} className="relative">
+                <Card key={index} className="relative glass border-border/50 hover:-translate-y-2 transition-transform duration-300">
                   <CardContent className="p-6">
                     <Quote className="h-8 w-8 text-primary/20 mb-4" />
                     <p className="text-foreground mb-6">{testimonial.quote}</p>
@@ -481,7 +481,7 @@ export default function HomePage() {
         {/* ════════════════════════════════════════════════════════════
             FAQ SECTION
         ════════════════════════════════════════════════════════════ */}
-        <section className="py-20 lg:py-28 bg-muted/30">
+        <section className="py-20 lg:py-28 relative">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
               {/* Section Header */}
@@ -525,9 +525,9 @@ export default function HomePage() {
                 ].map((faq, index) => (
                   <details
                     key={index}
-                    className="group rounded-lg border bg-card p-4 [&_summary::-webkit-details-marker]:hidden"
+                    className="group rounded-lg glass border-border/50 p-4 transition-all duration-300 hover:shadow-md [&_summary::-webkit-details-marker]:hidden cursor-pointer"
                   >
-                    <summary className="flex cursor-pointer items-center justify-between gap-4">
+                    <summary className="flex items-center justify-between gap-4 outline-none">
                       <h3 className="font-semibold">{faq.question}</h3>
                       <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-open:rotate-90" />
                     </summary>

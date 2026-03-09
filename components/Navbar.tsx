@@ -175,8 +175,8 @@ export function Navbar({ transparent = false, fixed = true, className }: NavbarP
           "w-full z-50 transition-all duration-300",
           fixed && "fixed top-0 left-0 right-0",
           transparent && !isScrolled
-            ? "bg-transparent"
-            : "bg-background/95 backdrop-blur-md border-b border-border shadow-sm",
+            ? "glass-transparent" // or bg-transparent
+            : "glass border-b border-border/50 transition-all duration-300",
           className
         )}
       >
@@ -545,10 +545,10 @@ function NavLinkItem({ href, children, isActive, icon }: NavLinkItemProps) {
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+        "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors nav-link-animated",
         isActive
-          ? "bg-primary/10 text-primary"
-          : "text-foreground/80 hover:text-foreground hover:bg-accent"
+          ? "text-primary active"
+          : "text-foreground/80 hover:text-foreground"
       )}
     >
       {icon}

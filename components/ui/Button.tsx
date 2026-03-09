@@ -51,39 +51,44 @@ const buttonVariants = cva(
       variant: {
         // Primary - Main CTA button
         default: [
-          "bg-primary",
+          "bg-primary bg-gradient-to-b from-white/10 to-transparent",
           "text-primary-foreground",
-          "shadow",
-          "hover:bg-primary/90",
+          "shadow-sm",
+          "border border-primary-foreground/10",
+          "hover:brightness-110",
           "hover:shadow-md",
+          "hover:-translate-y-0.5",
         ],
 
         // Destructive - Delete, cancel actions
         destructive: [
-          "bg-destructive",
+          "bg-destructive bg-gradient-to-b from-white/10 to-transparent",
           "text-destructive-foreground",
           "shadow-sm",
-          "hover:bg-destructive/90",
+          "hover:brightness-110",
+          "hover:shadow-md",
+          "hover:-translate-y-0.5",
         ],
 
         // Outline - Secondary actions
         outline: [
-          "border",
-          "border-input",
-          "bg-background",
+          "glass",
+          "border-border/50",
           "text-foreground",
           "shadow-sm",
-          "hover:bg-accent",
+          "hover:bg-accent/50",
           "hover:text-accent-foreground",
-          "hover:border-accent",
+          "hover:-translate-y-0.5",
         ],
 
         // Secondary - Less prominent actions
         secondary: [
-          "bg-secondary",
+          "bg-secondary/80 backdrop-blur-sm",
+          "border border-white/5",
           "text-secondary-foreground",
           "shadow-sm",
-          "hover:bg-secondary/80",
+          "hover:bg-secondary",
+          "hover:-translate-y-0.5",
         ],
 
         // Ghost - Minimal visual presence

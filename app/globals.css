@@ -380,13 +380,13 @@
      ───────────────────────────────────────── */
 
   .glass {
-    @apply bg-background/80 backdrop-blur-md;
-    @apply border border-border/50;
+    @apply bg-background/70 backdrop-blur-xl;
+    @apply border border-border/40 shadow-[0_4px_30px_rgba(0,0,0,0.05)];
   }
 
   .glass-dark {
-    @apply bg-background/60 backdrop-blur-lg;
-    @apply border border-white/10;
+    @apply bg-background/50 backdrop-blur-2xl;
+    @apply border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)];
   }
 
   /* ─────────────────────────────────────────
@@ -691,6 +691,30 @@
 
   .content-visible {
     content-visibility: visible;
+  }
+
+  /* ─────────────────────────────────────────
+     DECORATIVE BACKGROUNDS & EFFECTS
+     ───────────────────────────────────────── */
+  
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.03; /* Very faint grid */
+  }
+
+  .nav-link-animated {
+    @apply relative overflow-hidden;
+  }
+  .nav-link-animated::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-[2px] bg-primary scale-x-0 origin-right transition-transform duration-300 ease-out;
+  }
+  .nav-link-animated:hover::after,
+  .nav-link-animated.active::after {
+    @apply scale-x-100 origin-left;
   }
 }
 
