@@ -109,9 +109,67 @@ async function main() {
         }
     });
 
+    // Heritage Meats
+    const farmer4User = await prisma.user.create({
+        data: {
+            email: 'sales@heritagemeats.com',
+            name: 'Sarah Jenkins',
+            password: hashedDefaultPassword,
+            role: UserRole.FARMER,
+            status: AccountStatus.ACTIVE,
+            farmer: {
+                create: {
+                    farmName: 'Heritage Meats',
+                    description: 'Pasture-raised heritage breeds of pork, beef, and poultry. Dedicated to regenerative agriculture.',
+                    address: 'Westminster, MD',
+                    city: 'Westminster',
+                    state: 'MD',
+                    zipCode: '21157',
+                    certifications: ['Animal Welfare Approved', 'Non-GMO'],
+                    rating: 4.9,
+                    isVerified: true,
+                    phone: '(410) 555-0210',
+                    deliveryDays: ['Tuesday', 'Thursday'],
+                    leadTimeDays: 3,
+                    minimumOrderAmount: 200,
+                }
+            }
+        }
+    });
+
+    // Chesapeake Grains & Dairy
+    const farmer5User = await prisma.user.create({
+        data: {
+            email: 'orders@chesapeakegrains.com',
+            name: 'David Miller',
+            password: hashedDefaultPassword,
+            role: UserRole.FARMER,
+            status: AccountStatus.ACTIVE,
+            farmer: {
+                create: {
+                    farmName: 'Chesapeake Grains & Dairy',
+                    description: 'Stone-ground grains and small-batch dairy from the Eastern Shore.',
+                    address: 'Easton, MD',
+                    city: 'Easton',
+                    state: 'MD',
+                    zipCode: '21601',
+                    certifications: ['Organic'],
+                    rating: 4.7,
+                    isVerified: true,
+                    phone: '(410) 555-0222',
+                    deliveryDays: ['Wednesday', 'Friday'],
+                    leadTimeDays: 2,
+                    minimumOrderAmount: 100,
+                }
+            }
+        }
+    });
+
     const farmer1 = await prisma.farmer.findUnique({ where: { userId: farmer1User.id } });
     const farmer2 = await prisma.farmer.findUnique({ where: { userId: farmer2User.id } });
     const farmer3 = await prisma.farmer.findUnique({ where: { userId: farmer3User.id } });
+    const farmer4 = await prisma.farmer.findUnique({ where: { userId: farmer4User.id } });
+    const farmer5 = await prisma.farmer.findUnique({ where: { userId: farmer5User.id } });
 
     // ============================================
     // GROCERS (BUYERS)
@@ -139,7 +197,7 @@ async function main() {
                     receivingAddress: '813 N Charles St, Baltimore, MD 21201',
                     receivingDays: ['Tuesday', 'Wednesday', 'Friday'],
                     preferredDeliveryDays: ['Tuesday', 'Friday'],
-                    categoriesOfInterest: ['Fruits', 'Vegetables', 'Herbs', 'Dairy', 'Eggs'],
+                    categoriesOfInterest: ['Fruits', 'Vegetables', 'Herbs', 'Dairy', 'Eggs', 'Meat', 'Grains'],
                 }
             }
         }
@@ -167,7 +225,7 @@ async function main() {
                     receivingAddress: '5113 Roland Ave, Baltimore, MD 21210',
                     receivingDays: ['Monday', 'Wednesday', 'Friday'],
                     preferredDeliveryDays: ['Wednesday', 'Friday'],
-                    categoriesOfInterest: ['Fruits', 'Vegetables', 'Eggs'],
+                    categoriesOfInterest: ['Fruits', 'Vegetables', 'Eggs', 'Dairy'],
                 }
             }
         }
@@ -180,7 +238,7 @@ async function main() {
     // PRODUCTS
     // ============================================
 
-    if (farmer1 && farmer2 && farmer3) {
+    if (farmer1 && farmer2 && farmer3 && farmer4 && farmer5) {
         // Agriberry Products
         await prisma.product.createMany({
             data: [
@@ -220,6 +278,18 @@ async function main() {
                     isOrganic: true,
                     images: ['https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80'],
                 },
+                {
+                    farmerId: farmer1.id,
+                    name: 'Wildflower Honey',
+                    description: 'Raw, local wildflower honey from Hanover bees.',
+                    category: ProductCategory.HONEY,
+                    unit: ProductUnit.CASE,
+                    packSize: '12 x 16oz jars',
+                    pricePerUnit: 96.0,
+                    availableQty: 15,
+                    isOrganic: false,
+                    images: ['https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&q=80'],
+                },
             ],
         });
 
@@ -236,7 +306,7 @@ async function main() {
                     pricePerUnit: 16.0,
                     availableQty: 40,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1618376168163-05efea971164?w=800&q=80'],
                 },
                 {
                     farmerId: farmer3.id,
@@ -248,7 +318,7 @@ async function main() {
                     pricePerUnit: 24.0,
                     availableQty: 20,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1556910103-1c02745aec5e?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1589135043447-063991807d81?w=800&q=80'],
                 },
             ],
         });
@@ -280,6 +350,126 @@ async function main() {
                     isOrganic: true,
                     images: ['https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=800&q=80'],
                 },
+                {
+                    farmerId: farmer2.id,
+                    name: 'Heirloom Tomatoes',
+                    description: 'Assorted heirloom tomato varieties.',
+                    category: ProductCategory.VEGETABLES,
+                    unit: ProductUnit.CASE,
+                    packSize: '15 lbs',
+                    pricePerUnit: 45.0,
+                    availableQty: 40,
+                    isOrganic: true,
+                    images: ['https://images.unsplash.com/photo-1518977676601-b53f02ac6d31?w=800&q=80'],
+                },
+                {
+                    farmerId: farmer2.id,
+                    name: 'Local Jam Assortment',
+                    description: 'Artisanal jams made with farm-fresh fruit.',
+                    category: ProductCategory.OTHER,
+                    unit: ProductUnit.CASE,
+                    packSize: '12 x 8oz jars',
+                    pricePerUnit: 60.0,
+                    availableQty: 20,
+                    isOrganic: false,
+                    images: ['https://images.unsplash.com/photo-1623943362142-32a76f2382fe?w=800&q=80'],
+                },
+            ],
+        });
+
+        // Heritage Meats Products
+        await prisma.product.createMany({
+            data: [
+                {
+                    farmerId: farmer4.id,
+                    name: 'Grass-Fed Ground Beef',
+                    description: 'Regenerative pasture-raised 80/20 ground beef.',
+                    category: ProductCategory.MEAT,
+                    unit: ProductUnit.LB,
+                    packSize: '10 x 1lb packs',
+                    pricePerUnit: 8.5,
+                    availableQty: 60,
+                    isOrganic: false,
+                    images: ['https://images.unsplash.com/photo-1588168333986-5078d3ae3946?w=800&q=80'],
+                },
+                {
+                    farmerId: farmer4.id,
+                    name: 'Whole Pasture Chicken',
+                    description: 'Freedom Ranger breed chicken, average 4-5 lbs.',
+                    category: ProductCategory.POULTRY,
+                    unit: ProductUnit.PIECE,
+                    packSize: '1 chicken',
+                    pricePerUnit: 22.0,
+                    availableQty: 30,
+                    isOrganic: false,
+                    images: ['https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=800&q=80'],
+                },
+                {
+                    farmerId: farmer4.id,
+                    name: 'Heritage Pork Chops',
+                    description: 'Thick-cut, bone-in Berkshire pork chops.',
+                    category: ProductCategory.MEAT,
+                    unit: ProductUnit.LB,
+                    packSize: '4 x 12oz chops',
+                    pricePerUnit: 12.0,
+                    availableQty: 25,
+                    isOrganic: false,
+                    images: ['https://images.unsplash.com/photo-1602491951781-bc932a2ee7bc?w=800&q=80'],
+                },
+            ],
+        });
+
+        // Grains & Dairy Products
+        await prisma.product.createMany({
+            data: [
+                {
+                    farmerId: farmer5.id,
+                    name: 'Whole Milk',
+                    description: 'Non-homogenized cream-top milk in glass half-gallons.',
+                    category: ProductCategory.DAIRY,
+                    unit: ProductUnit.GALLON,
+                    packSize: '1/2 gallon bottle',
+                    pricePerUnit: 5.5,
+                    availableQty: 50,
+                    isOrganic: true,
+                    images: ['https://images.unsplash.com/photo-1563636619-e910ef2a844b?w=800&q=80'],
+                },
+                {
+                    farmerId: farmer5.id,
+                    name: 'Artisan Bread Flour',
+                    description: 'Stone-ground hard red winter wheat flour.',
+                    category: ProductCategory.GRAINS,
+                    unit: ProductUnit.LB,
+                    packSize: '5 lb bag',
+                    pricePerUnit: 7.5,
+                    availableQty: 100,
+                    isOrganic: true,
+                    images: ['https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80'],
+                },
+                {
+                    farmerId: farmer5.id,
+                    name: 'Salted Farmhouse Butter',
+                    description: 'High-fat cultured butter with sea salt.',
+                    category: ProductCategory.DAIRY,
+                    unit: ProductUnit.LB,
+                    packSize: '1 lb block',
+                    pricePerUnit: 9.0,
+                    availableQty: 40,
+                    isOrganic: true,
+                    images: ['https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=800&q=80'],
+                },
+                {
+                    farmerId: farmer5.id,
+                    name: 'Steel Cut Oats',
+                    description: 'Locally grown and hulled steel cut oats.',
+                    category: ProductCategory.GRAINS,
+                    unit: ProductUnit.LB,
+                    packSize: '2.5 lb bag',
+                    pricePerUnit: 4.5,
+                    availableQty: 80,
+                    isOrganic: true,
+                    images: ['https://images.unsplash.com/photo-1586439702132-4638536097ec?w=800&q=80'],
+                },
             ],
         });
     }
@@ -288,7 +478,7 @@ async function main() {
     // CONNECTIONS
     // ============================================
 
-    if (farmer1 && farmer2 && farmer3 && grocer1 && grocer2) {
+    if (farmer1 && farmer2 && farmer3 && farmer4 && farmer5 && grocer1 && grocer2) {
         await prisma.connection.createMany({
             data: [
                 {
@@ -304,9 +494,21 @@ async function main() {
                     approvedAt: new Date(),
                 },
                 {
+                    farmerId: farmer4.id,
+                    grocerId: grocer1.id,
+                    status: ConnectionStatus.APPROVED,
+                    approvedAt: new Date(),
+                },
+                {
                     farmerId: farmer3.id,
                     grocerId: grocer2.id,
                     status: ConnectionStatus.PENDING,
+                },
+                {
+                    farmerId: farmer5.id,
+                    grocerId: grocer2.id,
+                    status: ConnectionStatus.APPROVED,
+                    approvedAt: new Date(),
                 },
             ],
         });
