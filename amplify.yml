@@ -116,12 +116,19 @@ customHeaders:
         value: "public, max-age=86400"
 
 customRules:
-  - source: "/<*>"
-    target: "/index.html"
-    status: "404-200"
+  # API routes must take precedence
   - source: "/api/<*>"
     target: "/api/<*>"
     status: "200"
+  
+  # Next.js internal paths must take precedence
   - source: "/_next/<*>"
     target: "/_next/<*>"
     status: "200"
+
+  # Next.js SSR handles all other routes automatically.
+  # Do not use a 404-200 rewrite to index.html for SSR apps 
+  # unless you have a specific static fallback requirement.
+  - source: "/<*>"
+    target: "/index.html"
+    status: "404-200"

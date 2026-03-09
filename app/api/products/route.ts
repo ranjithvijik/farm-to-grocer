@@ -288,10 +288,16 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const params = Object.fromEntries(searchParams.entries());
 
+    // Handle 'search' alias for 'query'
+    if (params.search && !params.query) {
+      params.query = params.search;
+    }
+
     // Validate params
     const validationResult = searchParamsSchema.safeParse(params);
 
     if (!validationResult.success) {
+      console.warn("⚠️ Invalid query parameters:", validationResult.error.format());
       return createErrorResponse(
         "Invalid query parameters",
         "VALIDATION_ERROR",
@@ -310,44 +316,51 @@ export async function GET(
     );
 
     // Execute queries in parallel
-    const [products, total] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        skip,
-        take,
-        orderBy: {
-          [validatedParams.sortBy]: validatedParams.sortOrder,
-        },
-        include: {
-          farmer: {
-            include: {
-              user: {
-                select: {
-                  name: true,
-                  image: true,
+    try {
+      const [products, total] = await Promise.all([
+        prisma.product.findMany({
+          where,
+          skip,
+          take,
+          orderBy: {
+            [validatedParams.sortBy]: validatedParams.sortOrder,
+          },
+          include: {
+            farmer: {
+              include: {
+                user: {
+                  select: {
+                    name: true,
+                    image: true,
+                  },
                 },
               },
             },
           },
-        },
-      }),
-      prisma.product.count({ where }),
-    ]);
+        }),
+        prisma.product.count({ where }),
+      ]);
 
-    // Build pagination metadata
-    const meta = buildPaginationMeta(
-      total,
-      validatedParams.page,
-      validatedParams.limit
-    );
+      // Build pagination metadata
+      const meta = buildPaginationMeta(
+        total,
+        validatedParams.page,
+        validatedParams.limit
+      );
 
-    return NextResponse.json({
-      success: true,
-      data: products as ProductWithFarmer[],
-      meta,
-    });
+      return NextResponse.json({
+        success: true,
+        data: products as ProductWithFarmer[],
+        meta,
+      });
+    } catch (queryError) {
+      console.error("❌ Prisma query execution failed:", queryError);
+      throw queryError; // Rethrow to be caught by outer catch block
+    }
   } catch (error) {
-    console.error("GET /api/products error:", error);
+    console.error("❌ GET /api/products fatal error:", error);
+
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
 
     if (isPrismaError(error)) {
       return createErrorResponse(
@@ -358,7 +371,7 @@ export async function GET(
     }
 
     return createErrorResponse(
-      "An unexpected error occurred",
+      errorMessage,
       "INTERNAL_ERROR",
       500
     ) as any;

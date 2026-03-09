@@ -23,7 +23,7 @@ export default function MissionPage() {
                     {/* Background decoration */}
                     <div className="absolute inset-0 opacity-20">
                         <Image
-                            src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&q=80"
+                            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80"
                             alt="Harvest"
                             fill
                             className="object-cover"
@@ -49,7 +49,7 @@ export default function MissionPage() {
                         </div>
                         <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
                             <Image
-                                src="https://images.unsplash.com/photo-1530836369250-ef71a3f5e4bc?auto=format&fit=crop&q=80"
+                                src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1200&q=80"
                                 alt="Farm land"
                                 fill
                                 className="object-cover"

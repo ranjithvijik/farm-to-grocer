@@ -1,12 +1,24 @@
 "use client";
 
 import * as React from "react";
-import { Search, Filter, X, ChevronDown } from "lucide-react";
+import { Search, Filter, Tag, CircleDollarSign } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Label } from "@/components/ui/Label";
+import { Separator } from "@/components/ui/Separator";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/Accordion";
 import { ProductCategory, ProductCategoryLabels } from "@/types";
 import { cn } from "@/lib/utils";
+
+const C_DARK = "hsl(30,15%,10%)";
+const C_MED = "hsl(30,10%,38%)";
+const C_G_LIGHT = "hsl(142,20%,94%)";
 
 interface ProductFilterProps {
     onFilterChange: (filters: {
@@ -52,91 +64,132 @@ export function ProductFilter({ onFilterChange, className }: ProductFilterProps)
     };
 
     return (
-        <Card className={cn("sticky top-20 h-fit", className)}>
-            <CardHeader className="pb-3 border-b">
+        <Card className={cn("border bg-white shadow-sm overflow-hidden", className)} style={{ borderColor: C_G_LIGHT }}>
+            <CardHeader className="pb-4 pt-5 px-6" style={{ background: "rgba(244, 245, 237, 0.4)" }}>
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-bold flex items-center gap-2">
-                        <Filter className="h-4 w-4" />
-                        Filters
+                    <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2" style={{ color: C_DARK }}>
+                        <Filter className="h-4 w-4 text-emerald-600" />
+                        Refine Search
                     </CardTitle>
-                    <Button variant="ghost" size="sm" onClick={handleReset} className="h-8 text-xs">
+                    <button
+                        onClick={handleReset}
+                        className="text-[10px] font-bold uppercase tracking-widest hover:text-emerald-700 transition-colors"
+                        style={{ color: C_MED }}
+                    >
                         Reset
-                    </Button>
+                    </button>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-6 pt-6">
-                {/* Search */}
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold">Search</label>
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search products..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="pl-9"
-                            onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
-                        />
-                    </div>
-                </div>
 
-                {/* Categories */}
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold">Categories</label>
-                    <div className="grid grid-cols-1 gap-1">
-                        <button
-                            onClick={() => setSelectedCategory("ALL")}
-                            className={cn(
-                                "text-left px-3 py-1.5 rounded-md text-sm transition-colors",
-                                selectedCategory === "ALL"
-                                    ? "bg-primary text-primary-foreground font-medium"
-                                    : "hover:bg-accent text-muted-foreground"
-                            )}
-                        >
-                            All Categories
-                        </button>
-                        {Object.entries(ProductCategoryLabels).map(([key, label]) => (
-                            <button
-                                key={key}
-                                onClick={() => setSelectedCategory(key as ProductCategory)}
-                                className={cn(
-                                    "text-left px-3 py-1.5 rounded-md text-sm transition-colors",
-                                    selectedCategory === key
-                                        ? "bg-primary text-primary-foreground font-medium"
-                                        : "hover:bg-accent text-muted-foreground"
-                                )}
+            <Separator style={{ backgroundColor: C_G_LIGHT }} />
+
+            <CardContent className="p-0">
+                <Accordion type="multiple" defaultValue={["search", "categories", "price"]} className="w-full">
+                    {/* Search Field */}
+                    <AccordionItem value="search" className="border-b-0">
+                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50/50 transition-colors">
+                            <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                <Search className="h-3.5 w-3.5 opacity-40" />
+                                Search Keywords
+                            </span>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-6 pb-6 pt-1">
+                            <div className="relative group">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-emerald-600 transition-colors" />
+                                <Input
+                                    placeholder="Strawberries, Kale, Honey..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="pl-9 h-10 bg-gray-50/50 border-gray-200 focus:bg-white transition-all text-sm"
+                                    onKeyDown={(e) => e.key === "Enter" && handleApplyFilters()}
+                                />
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+
+                    <Separator className="mx-6 w-auto" style={{ backgroundColor: C_G_LIGHT }} />
+
+                    {/* Categories */}
+                    <AccordionItem value="categories" className="border-b-0">
+                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50/50 transition-colors">
+                            <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                <Tag className="h-3.5 w-3.5 opacity-40" />
+                                Categories
+                            </span>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-6 pb-6 pt-1">
+                            <div className="flex flex-col gap-1">
+                                <button
+                                    onClick={() => setSelectedCategory("ALL")}
+                                    className={cn(
+                                        "text-left px-3 py-2 rounded-lg text-sm transition-all duration-200",
+                                        selectedCategory === "ALL"
+                                            ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-200/50 translate-x-1"
+                                            : "hover:bg-emerald-50 text-gray-600 hover:text-emerald-800"
+                                    )}
+                                >
+                                    All Produce
+                                </button>
+                                {Object.entries(ProductCategoryLabels).map(([key, label]) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => setSelectedCategory(key as ProductCategory)}
+                                        className={cn(
+                                            "text-left px-3 py-2 rounded-lg text-sm transition-all duration-200",
+                                            selectedCategory === key
+                                                ? "bg-emerald-600 text-white font-bold shadow-md shadow-emerald-200/50 translate-x-1"
+                                                : "hover:bg-emerald-50 text-gray-600 hover:text-emerald-800"
+                                        )}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+
+                    <Separator className="mx-6 w-auto" style={{ backgroundColor: C_G_LIGHT }} />
+
+                    {/* Price Range */}
+                    <AccordionItem value="price" className="border-b-0">
+                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-50/50 transition-colors">
+                            <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                                <CircleDollarSign className="h-3.5 w-3.5 opacity-40" />
+                                Price Range
+                            </span>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-6 pb-6 pt-1">
+                            <div className="grid grid-cols-2 gap-3 items-center">
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] uppercase tracking-widest font-bold opacity-50">Min ($)</Label>
+                                    <Input
+                                        type="number"
+                                        placeholder="0"
+                                        value={minPrice}
+                                        onChange={(e) => setMinPrice(e.target.value)}
+                                        className="h-9 bg-gray-50/50 border-gray-200"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Label className="text-[10px] uppercase tracking-widest font-bold opacity-50">Max ($)</Label>
+                                    <Input
+                                        type="number"
+                                        placeholder="500"
+                                        value={maxPrice}
+                                        onChange={(e) => setMaxPrice(e.target.value)}
+                                        className="h-9 bg-gray-50/50 border-gray-200"
+                                    />
+                                </div>
+                            </div>
+                            <Button
+                                className="w-full mt-6 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg shadow-lg shadow-emerald-100 transition-all hover:-translate-y-0.5"
+                                onClick={handleApplyFilters}
                             >
-                                {label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Price Range */}
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold">Price Range</label>
-                    <div className="flex items-center gap-2">
-                        <Input
-                            type="number"
-                            placeholder="Min"
-                            value={minPrice}
-                            onChange={(e) => setMinPrice(e.target.value)}
-                            className="h-9"
-                        />
-                        <span className="text-muted-foreground">—</span>
-                        <Input
-                            type="number"
-                            placeholder="Max"
-                            value={maxPrice}
-                            onChange={(e) => setMaxPrice(e.target.value)}
-                            className="h-9"
-                        />
-                    </div>
-                </div>
-
-                <Button className="w-full" onClick={handleApplyFilters}>
-                    Apply Filters
-                </Button>
+                                Apply Filters
+                            </Button>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             </CardContent>
         </Card>
     );
