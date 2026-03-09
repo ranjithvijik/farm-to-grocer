@@ -19,7 +19,7 @@ applications:
               if [ -z "$NEXTAUTH_SECRET" ]; then echo "ERROR: NEXTAUTH_SECRET is not set" && exit 1; fi
               echo "Required environment variables are present."
 
-            - 'npm ci'
+            - 'npm ci --legacy-peer-deps'
             - 'npx prisma generate'
             
             # --- DATABASE MIGRATIONS & SEEDING ---
