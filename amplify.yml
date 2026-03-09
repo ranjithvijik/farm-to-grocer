@@ -25,14 +25,27 @@ applications:
             # --- DATABASE MIGRATIONS & SEEDING ---
             - |
               if [ "$AWS_BRANCH" = "main" ] || [ "$AWS_BRANCH" = "production" ]; then
-                echo "Running database migrations..."
-                npx prisma migrate deploy
+                echo "--- DATABASE TASKS ---"
                 
-                # Check if seeding is needed (e.g., first deploy)
-                # You can set FORCE_SEED=true in Amplify Console to re-run seed
+                echo "Testing connectivity..."
+                npx ts-node --compiler-options '{"module":"CommonJS"}' scripts/test-db-connection.ts
+                
+                echo "Running database migrations..."
+                if npx prisma migrate deploy; then
+                  echo "✅ Migrations completed successfully."
+                else
+                  echo "❌ Migrations failed. Check credentials."
+                  exit 1
+                fi
+                
                 if [ "$FORCE_SEED" = "true" ]; then
                   echo "Force seeding database..."
-                  npx prisma db seed
+                  if npx prisma db seed; then
+                    echo "✅ Seeding completed successfully."
+                  else
+                    echo "❌ Seeding failed."
+                    exit 1
+                  fi
                 fi
               else
                 echo "Skipping production-level database tasks for branch $AWS_BRANCH"
