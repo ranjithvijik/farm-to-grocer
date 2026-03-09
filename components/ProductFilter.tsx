@@ -24,6 +24,16 @@ export function ProductFilter({ onFilterChange, className }: ProductFilterProps)
     const [minPrice, setMinPrice] = React.useState<string>("");
     const [maxPrice, setMaxPrice] = React.useState<string>("");
 
+    // Handle instant category changes
+    React.useEffect(() => {
+        onFilterChange({
+            search: search || undefined,
+            category: selectedCategory === "ALL" ? undefined : selectedCategory,
+            minPrice: minPrice ? parseFloat(minPrice) : undefined,
+            maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+        });
+    }, [selectedCategory]); // Only trigger when category changes directly
+
     const handleApplyFilters = React.useCallback(() => {
         onFilterChange({
             search: search || undefined,
