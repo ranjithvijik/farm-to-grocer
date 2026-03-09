@@ -112,13 +112,13 @@ const HOW_IT_WORKS = [
     step: "02",
     title: "Browse & Connect",
     desc: "Explore verified local farms near you. Filter by certification, delivery day, product category, or price.",
-    img: "https://images.unsplash.com/photo-1592457764956-8b1b0cd8bc47?w=600&q=80",
+    img: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80",
   },
   {
     step: "03",
     title: "Order with Confidence",
     desc: "Place orders directly, message your farmer, and track delivery in real time — all in one place.",
-    img: "https://images.unsplash.com/photo-1560493676-04915de9ecd5?w=600&q=80",
+    img: "https://images.unsplash.com/photo-1595196113184-e9104fa27546?w=800&q=80",
   },
 ];
 
@@ -152,7 +152,7 @@ const TESTIMONIALS = [
 const GALLERY = [
   { src: "https://images.unsplash.com/photo-1506484381205-f7945653044d?w=800&q=80", alt: "Fresh vegetables" },
   { src: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&q=80", alt: "Strawberries" },
-  { src: "https://images.unsplash.com/photo-1560493676-04915de9ecd5?w=800&q=80", alt: "Farm at sunrise" },
+  { src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&q=80", alt: "Farm at sunrise" },
   { src: "https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=800&q=80", alt: "Blueberries" },
   { src: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=800&q=80", alt: "Farm eggs" },
   { src: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=800&q=80", alt: "Farm landscape" },
