@@ -318,7 +318,7 @@ async function main() {
                     pricePerUnit: 24.0,
                     availableQty: 20,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1546552723-ba178a99370f?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1595855759920-86582396756a?w=800&q=80'],
                 },
             ],
         });
@@ -390,7 +390,7 @@ async function main() {
                     pricePerUnit: 8.5,
                     availableQty: 60,
                     isOrganic: false,
-                    images: ['https://images.unsplash.com/photo-1551028150-64b9f398f678?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?w=800&q=80'],
                 },
                 {
                     farmerId: farmer4.id,
@@ -432,7 +432,7 @@ async function main() {
                     pricePerUnit: 5.5,
                     availableQty: 50,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1550583724-125581820ffb?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1563636619-e910f01ff18a?w=800&q=80'],
                 },
                 {
                     farmerId: farmer5.id,
@@ -468,7 +468,7 @@ async function main() {
                     pricePerUnit: 4.5,
                     availableQty: 80,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1506484334406-f119ca483aa3?w=800&q=80'],
+                    images: ['https://images.unsplash.com/photo-1589133095560-645479261a29?w=800&q=80'],
                 },
             ],
         });
