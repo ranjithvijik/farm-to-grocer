@@ -25,6 +25,14 @@ applications:
             # Generate Prisma client
             - "npx prisma generate"
             
+            # --- RUNTIME ENVIRONMENT SETUP ---
+            # Amplify SSR requires env vars to be written to a file for runtime access
+            - |
+              echo "Setting up runtime environment variables..."
+              echo "DATABASE_URL=$DATABASE_URL" >> .env.production
+              echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env.production
+              echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env.production
+
             # Database tasks (non-fatal so app can deploy without DB)
             - |
               if [ "$AWS_BRANCH" = "main" ] || [ "$AWS_BRANCH" = "production" ]; then
