@@ -35,8 +35,8 @@ applications:
         preBuild:
           commands:
             # Display Node.js and npm versions for debugging
-            - echo "Node.js version:" && node --version
-            - echo "npm version:" && npm --version
+            - 'echo "Node.js version:" && node --version'
+            - 'echo "npm version:" && npm --version'
             
             # Install pnpm globally (if using pnpm)
             # Uncomment if your project uses pnpm
@@ -57,7 +57,7 @@ applications:
                 echo "Running database migrations..."
                 npx prisma migrate deploy
               else
-                echo "Skipping migrations for branch: $AWS_BRANCH"
+                echo "Skipping migrations for branch $AWS_BRANCH"
               fi
 
         # ─────────────────────────────────────────────────────────
@@ -66,8 +66,8 @@ applications:
         build:
           commands:
             # Display build information
-            - echo "Building Farm-to-Grocer for branch: $AWS_BRANCH"
-            - echo "Commit: $AWS_COMMIT_ID"
+            - 'echo "Building Farm-to-Grocer for branch: $AWS_BRANCH"'
+            - 'echo "Commit: $AWS_COMMIT_ID"'
             
             # Set environment-specific variables
             - |
@@ -124,13 +124,6 @@ applications:
           # Cache npm cache directory
           - ~/.npm/**/*
 
-      # ═══════════════════════════════════════════════════════════
-      # BUILD SETTINGS
-      # ═══════════════════════════════════════════════════════════
-      buildSettings:
-        # Build timeout in minutes (default: 30)
-        # Increase for larger projects
-        buildTimeout: 30
 
 # ───────────────────────────────────────────────────────────────
 # ENVIRONMENT VARIABLES
