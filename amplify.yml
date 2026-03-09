@@ -11,14 +11,31 @@ applications:
           commands:
             - 'echo "Node.js version:" && node --version'
             - 'echo "npm version:" && npm --version'
+            
+            # --- BACKEND CONNECTIVITY VALIDATION ---
+            - |
+              echo "Validating environment variables..."
+              if [ -z "$DATABASE_URL" ]; then echo "ERROR: DATABASE_URL is not set" && exit 1; fi
+              if [ -z "$NEXTAUTH_SECRET" ]; then echo "ERROR: NEXTAUTH_SECRET is not set" && exit 1; fi
+              echo "Required environment variables are present."
+
             - 'npm ci'
             - 'npx prisma generate'
+            
+            # --- DATABASE MIGRATIONS & SEEDING ---
             - |
               if [ "$AWS_BRANCH" = "main" ] || [ "$AWS_BRANCH" = "production" ]; then
                 echo "Running database migrations..."
                 npx prisma migrate deploy
+                
+                # Check if seeding is needed (e.g., first deploy)
+                # You can set FORCE_SEED=true in Amplify Console to re-run seed
+                if [ "$FORCE_SEED" = "true" ]; then
+                  echo "Force seeding database..."
+                  npx prisma db seed
+                fi
               else
-                echo "Skipping migrations for branch $AWS_BRANCH"
+                echo "Skipping production-level database tasks for branch $AWS_BRANCH"
               fi
         build:
           commands:
