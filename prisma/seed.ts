@@ -313,6 +313,101 @@ async function main() {
     }
 
     // ============================================
+    // CART ITEMS
+    // ============================================
+
+    // Give Grocer2 some items in their cart
+    if (grocer2 && farmer1 && farmer3) {
+        const agProduct = await prisma.product.findFirst({ where: { farmerId: farmer1.id, name: 'Strawberries' } });
+        const babyProduct = await prisma.product.findFirst({ where: { farmerId: farmer3.id, name: 'Fresh Basil' } });
+
+        if (agProduct && babyProduct) {
+            await prisma.cartItem.createMany({
+                data: [
+                    { grocerId: grocer2.id, productId: agProduct.id, quantity: 2 },
+                    { grocerId: grocer2.id, productId: babyProduct.id, quantity: 5 }
+                ]
+            });
+        }
+    }
+
+    // ============================================
+    // ORDERS & PAYMENTS
+    // ============================================
+
+    if (grocer1 && farmer2) {
+        const fullbrightProduct = await prisma.product.findFirst({ where: { farmerId: farmer2.id, name: 'Farm Fresh Eggs' } });
+
+        if (fullbrightProduct) {
+            const order = await prisma.order.create({
+                data: {
+                    orderNumber: 'ORD-2026-0001',
+                    farmerId: farmer2.id,
+                    grocerId: grocer1.id,
+                    status: 'CONFIRMED',
+                    paymentStatus: 'PAID',
+                    deliveryMethod: 'DELIVERY',
+                    subtotal: 32.50, // 5 * 6.50
+                    tax: 0,
+                    deliveryFee: 15.00,
+                    total: 47.50,
+                    notes: 'Please leave at the loading dock.',
+                    deliveryAddress: grocer1.receivingAddress || grocer1.address,
+                    deliveryDate: new Date(Date.now() + 86400000 * 2), // 2 days from now
+                    items: {
+                        create: [
+                            {
+                                productId: fullbrightProduct.id,
+                                productName: fullbrightProduct.name,
+                                quantity: 5,
+                                pricePerUnit: fullbrightProduct.pricePerUnit,
+                                total: 5 * fullbrightProduct.pricePerUnit
+                            }
+                        ]
+                    },
+                    payment: {
+                        create: {
+                            amount: 47.50,
+                            method: 'stripe',
+                            transactionId: 'pi_test_1234567890',
+                            status: 'PAID',
+                            paidAt: new Date(),
+                        }
+                    },
+                    messages: {
+                        create: [
+                            {
+                                senderId: farmer2.userId,
+                                message: 'Thanks for the order! Will deliver on Friday morning.',
+                            }
+                        ]
+                    }
+                }
+            });
+
+            // Add notification for the order
+            await prisma.notification.create({
+                data: {
+                    userId: grocer1.userId,
+                    type: 'ORDER_CONFIRMED',
+                    title: 'Order Confirmed',
+                    message: `Your order ${order.orderNumber} has been confirmed by ${farmer2.farmName}.`,
+                    link: `/grocer/orders`
+                }
+            });
+            await prisma.notification.create({
+                data: {
+                    userId: farmer2.userId,
+                    type: 'ORDER_PLACED',
+                    title: 'New Order Received',
+                    message: `You received a new order ${order.orderNumber} from ${grocer1.businessName}.`,
+                    link: `/farmer/orders`
+                }
+            });
+        }
+    }
+
+    // ============================================
     // ADMIN USER
     // ============================================
 
