@@ -62,7 +62,7 @@ const footerLinks = {
       { label: "FAQs", href: "/faq" },
       { label: "Farmer Guide", href: "/guides/farmers" },
       { label: "Grocer Guide", href: "/guides/grocers" },
-      { label: "API Documentation", href: "/docs/api", external: true },
+      { label: "API Documentation", href: "/docs/api" },
     ],
   },
   legal: {
