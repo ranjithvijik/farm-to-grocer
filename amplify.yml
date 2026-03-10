@@ -44,11 +44,9 @@ applications:
                   if npx prisma db push --accept-data-loss; then
                     echo "Schema synchronized successfully."
                     # Seed if FORCE_SEED is true OR if database is empty
-                    SHOULD_SEED=false
-                    if [ "$FORCE_SEED" = "true" ]; then SHOULD_SEED=true; fi
+                    SHOULD_SEED=true
                     if ! node -e "const { PrismaClient } = require('@prisma/client'); const p = new PrismaClient(); p.product.count().then(c => process.exit(c > 0 ? 0 : 1)).catch(() => process.exit(1))"; then
                       echo "Database appears empty, triggering seed..."
-                      SHOULD_SEED=true
                     fi
                     
                     if [ "$SHOULD_SEED" = "true" ]; then

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -74,7 +73,7 @@ export default function BlogPage() {
                     <div className="container mx-auto px-4 max-w-6xl">
                         <div className="grid md:grid-cols-2 gap-12 items-center">
                             <div className="relative h-[300px] md:h-[400px] rounded-xl overflow-hidden shadow-md">
-                                <Image src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80" alt="Featured post" fill className="object-cover" />
+                                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80" alt="Featured post" className="object-cover w-full h-full" />
                             </div>
                             <div className="space-y-6">
                                 <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full">
@@ -100,7 +99,7 @@ export default function BlogPage() {
                             {posts.map((post, i) => (
                                 <Link href="#" key={i} className="group flex flex-col items-start space-y-4">
                                     <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-sm border">
-                                        <Image src={post.img} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                                        <img src={post.img} alt={post.title} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
                                     </div>
                                     <div className="flex w-full items-center justify-between text-sm">
                                         <span className="font-semibold text-primary">{post.category}</span>
