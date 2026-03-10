@@ -306,7 +306,7 @@ export default function HomePage() {
         ══════════════════════════════════════════════════ */}
         <section className="py-14" style={{ background: C_CREAM }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {STATS.map((s, i) => (
                 <div
                   key={s.label}
@@ -349,19 +349,19 @@ export default function HomePage() {
         ══════════════════════════════════════════════════ */}
         <section className="py-24" style={{ background: C_CREAM }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16 animate-fade-in-up">
-              <p className="text-sm font-bold tracking-widest uppercase mb-3" style={{ color: C_GREEN }}>
+            <div className="text-center mb-12 sm:mb-16 animate-fade-in-up">
+              <p className="text-xs sm:text-sm font-bold tracking-widest uppercase mb-3" style={{ color: C_GREEN }}>
                 Why Farm to Grocer
               </p>
-              <h2 className="font-display text-4xl font-bold sm:text-5xl" style={{ color: C_DARK }}>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold" style={{ color: C_DARK }}>
                 Everything You Need to Source Local
               </h2>
-              <p className="mt-5 text-lg font-medium max-w-2xl mx-auto" style={{ color: C_MED }}>
+              <p className="mt-4 sm:mt-5 text-base sm:text-lg font-medium max-w-2xl mx-auto" style={{ color: C_MED }}>
                 Purpose-built tools for modern grocery procurement and farm sales — all in one platform.
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {FEATURES.map((f, i) => (
                 <div
                   key={f.title}

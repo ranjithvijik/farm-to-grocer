@@ -95,7 +95,7 @@ Farm to Grocer provides a modern, easy-to-use platform where:
 | ✅ Modern Design Theme | Global premium glassmorphism aesthetic with engaging micro-animations |
 | ✅ Role-Based Access | Farmer, Grocer, and Admin roles |
 | ✅ Real-time Notifications | Order updates, messages, alerts |
-| ✅ Responsive Design | Mobile-first, works on all devices |
+| ✅ Responsive Design | Mobile-first, completely audited vertical stacking on all devices |
 | ✅ Dark Mode | Full dark theme support |
 | ✅ Stripe Payments | Secure payment processing |
 | ✅ System Observability | Robust `/api/health` monitoring for db/memory/config tracking |
