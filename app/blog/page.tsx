@@ -9,46 +9,46 @@ import { ArrowRight } from "lucide-react";
 export default function BlogPage() {
     const posts = [
         {
-            title: "5 Crops with the Highest Demand in Urban Markets",
-            excerpt: "Discover what city grocers are paying premium prices for this summer, and how to optimize your planting schedule.",
-            category: "For Farmers",
-            date: "Nov 12, 2025",
-            img: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&q=80"
+            title: "From Farm to Grocer: How Technology is Enabling Hyper-Local Sourcing",
+            excerpt: "We explore the rise of inventory-tracking software and B2B platforms that bridge the gap between regional farmers and local supermarkets.",
+            category: "Tech & Innovation",
+            date: "Mar 05, 2026",
+            img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80"
         },
         {
-            title: "The Ultimate Guide to Storing Root Vegetables",
-            excerpt: "Extend the shelf life of carrots, potatoes, and beets with these simple temperature and humidity strategies.",
-            category: "For Grocers",
-            date: "Oct 28, 2025",
-            img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?auto=format&fit=crop&q=80"
-        },
-        {
-            title: "Platform Update: Streamlined Delivery Scheduling",
-            excerpt: "We've revamped the logistics tab. Buyers and sellers can now coordinate third-party delivery directly in the app.",
-            category: "Product News",
-            date: "Sep 05, 2025",
-            img: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&q=80"
-        },
-        {
-            title: "Interview: How Green Valley Farm Doubled Their Retail Orders",
-            excerpt: "A look into how one mid-sized sustainable farm used our marketplace to ditch wholesale and go direct to grocer.",
-            category: "Case Study",
-            date: "Aug 19, 2025",
-            img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&q=80"
-        },
-        {
-            title: "Understanding Regenerative Agriculture Certifications",
-            excerpt: "Confused by the new labels? Here's what they mean and why consumers are willing to pay more for them.",
+            title: "The Rise of Regenerative Agriculture: Why Consumers Pay a Premium",
+            excerpt: "Sustainability is no longer a buzzword for 2026. Shoppers actively seek grocers offering products from carbon-neutral, regenerative farms.",
             category: "Industry Insights",
-            date: "Jul 01, 2025",
-            img: "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?auto=format&fit=crop&q=80"
+            date: "Feb 22, 2026",
+            img: "https://images.unsplash.com/photo-1628102491629-778571d893a3?auto=format&fit=crop&q=80"
         },
         {
-            title: "Maximizing Your Farm Profile for Better Visibility",
-            excerpt: "Simple tips to make your listings stand out to local retailers when they're sourcing ingredients.",
-            category: "For Farmers",
-            date: "Jun 14, 2025",
-            img: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&q=80"
+            title: "Overcoming Logistics: New Solutions for Regional Food Distribution",
+            excerpt: "A deep dive into how food hubs, shared transport models, and cold-chain innovations are keeping small farm produce fresh on grocer shelves.",
+            category: "Logistics",
+            date: "Feb 10, 2026",
+            img: "https://images.unsplash.com/photo-1586528116311-ad8ed7c159bf?auto=format&fit=crop&q=80"
+        },
+        {
+            title: "How Smart Labeling is Building Trust Between Consumers and Farms",
+            excerpt: "QR codes on produce are giving shoppers unprecedented insight into harvest dates, travel miles, and farm practices.",
+            category: "Consumer Trends",
+            date: "Jan 28, 2026",
+            img: "https://images.unsplash.com/photo-1620857502441-2b04791a81dc?auto=format&fit=crop&q=80"
+        },
+        {
+            title: "The Economic Impact of Keeping Food Spending within the Community",
+            excerpt: "A recent study shows that every dollar spent on local produce through independent grocers returns significantly more to the local economy than national chains.",
+            category: "Market Study",
+            date: "Jan 12, 2026",
+            img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80"
+        },
+        {
+            title: "Supermarkets vs. Farmers Markets: The Shifting Landscape of Local Foods",
+            excerpt: "With regional chains scaling up their local sourcing programs, the definition of \"local\" continues to evolve in the modern retail environment.",
+            category: "Retail Trends",
+            date: "Dec 30, 2025",
+            img: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80"
         }
     ];
 
@@ -73,7 +73,7 @@ export default function BlogPage() {
                     <div className="container mx-auto px-4 max-w-6xl">
                         <div className="grid md:grid-cols-2 gap-12 items-center">
                             <div className="relative h-[300px] md:h-[400px] rounded-xl overflow-hidden shadow-md">
-                                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80" alt="Featured post" className="object-cover w-full h-full" />
+                                <img src="https://images.unsplash.com/photo-1595853035070-59a39dfc7365?auto=format&fit=crop&q=80" alt="Featured post" className="object-cover w-full h-full" />
                             </div>
                             <div className="space-y-6">
                                 <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full">
@@ -81,7 +81,7 @@ export default function BlogPage() {
                                 </div>
                                 <h2 className="text-3xl md:text-4xl font-bold">State of Local Food Sourcing 2026</h2>
                                 <p className="text-lg text-muted-foreground">
-                                    Our annual report breaks down buying trends among independent grocers, the highest yielding crops for local farmers, and the logistical challenges we solved this year.
+                                    Our annual report details how the "farm-to-grocer" supply chain evolved this year. From transparent QR supply tracking to grocers scaling up climate-friendly sustainable produce.
                                 </p>
                                 <Button size="lg" className="w-full sm:w-auto" asChild>
                                     <Link href="#">Read the Report <ArrowRight className="ml-2 h-4 w-4" /></Link>
