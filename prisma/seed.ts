@@ -306,7 +306,7 @@ async function main() {
                     pricePerUnit: 16.0,
                     availableQty: 40,
                     isOrganic: true,
-                    images: ['https://images.unsplash.com/photo-1673264299749-cf67bb04a9a8?w=800&q=80'],
+                    images: ['/images/freshbasil.jpg'],
                 },
                 {
                     farmerId: farmer3.id,
@@ -390,7 +390,7 @@ async function main() {
                     pricePerUnit: 8.5,
                     availableQty: 60,
                     isOrganic: false,
-                    images: ['https://images.unsplash.com/photo-1668616817443-f64ce045ccc2?w=800&q=80'],
+                    images: ['/images/groundbeef.jpg'],
                 },
                 {
                     farmerId: farmer4.id,
