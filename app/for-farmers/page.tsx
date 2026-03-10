@@ -38,7 +38,7 @@ export default function ForFarmersPage() {
                         </div>
                         <div className="relative h-[400px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl z-10">
                             <Image
-                                src="https://images.unsplash.com/photo-1592982537447-6f2334965251?auto=format&fit=crop&q=80"
+                                src="https://images.unsplash.com/photo-1661420226112-311050ce30da?auto=format&fit=crop&q=80"
                                 alt="Farmer inspecting crops"
                                 fill
                                 className="object-cover"
@@ -105,7 +105,7 @@ export default function ForFarmersPage() {
                         <div className="grid md:grid-cols-2 gap-16 items-center">
                             <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl hidden md:block border-4 border-primary-foreground/20">
                                 <Image
-                                    src="https://images.unsplash.com/photo-1595856453085-f53835061690?auto=format&fit=crop&q=80"
+                                    src="https://images.unsplash.com/photo-1602867741746-6df80f40b3f6?auto=format&fit=crop&q=80"
                                     alt="Farmer using a tablet in the field"
                                     fill
                                     className="object-cover"
