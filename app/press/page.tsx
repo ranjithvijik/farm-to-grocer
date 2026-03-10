@@ -62,19 +62,35 @@ export default function PressPage() {
                                 <h2 className="text-3xl font-bold mb-8 tracking-tight">Brand Assets</h2>
                                 <div className="space-y-6">
                                     <div className="border rounded-xl p-8 text-center bg-muted/20">
-                                        <div className="h-20 w-auto flex items-center justify-center mb-6">
-                                            <span className="text-3xl font-black tracking-tighter text-primary">Farm to Grocer</span>
+                                        <div className="h-24 w-auto flex items-center justify-center mb-6">
+                                            <Image
+                                                src="/images/brand/logo-primary.svg"
+                                                alt="Farm to Grocer Primary Logo"
+                                                width={250}
+                                                height={60}
+                                                className="w-auto h-full max-h-16"
+                                            />
                                         </div>
-                                        <Button variant="secondary" size="sm" className="w-full gap-2 font-bold">
-                                            <Download className="h-4 w-4" /> Primary Logo (.SVG)
+                                        <Button variant="secondary" size="sm" asChild className="w-full gap-2 font-bold cursor-pointer">
+                                            <a href="/images/brand/logo-primary.svg" download="FarmToGrocer-PrimaryLogo.svg">
+                                                <Download className="h-4 w-4" /> Primary Logo (.SVG)
+                                            </a>
                                         </Button>
                                     </div>
                                     <div className="border border-input bg-primary text-primary-foreground rounded-xl p-8 text-center">
-                                        <div className="h-20 w-auto flex items-center justify-center mb-6">
-                                            <span className="text-3xl font-black tracking-tighter text-primary-foreground">Farm to Grocer</span>
+                                        <div className="h-24 w-auto flex items-center justify-center mb-6">
+                                            <Image
+                                                src="/images/brand/logo-knockout.svg"
+                                                alt="Farm to Grocer Knockout Logo"
+                                                width={250}
+                                                height={60}
+                                                className="w-auto h-full max-h-16"
+                                            />
                                         </div>
-                                        <Button variant="outline" size="sm" className="w-full gap-2 font-bold bg-transparent text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground hover:text-primary">
-                                            <Download className="h-4 w-4" /> Knockout Logo (.SVG)
+                                        <Button variant="outline" size="sm" asChild className="w-full gap-2 font-bold bg-transparent text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground hover:text-primary cursor-pointer">
+                                            <a href="/images/brand/logo-knockout.svg" download="FarmToGrocer-KnockoutLogo.svg">
+                                                <Download className="h-4 w-4" /> Knockout Logo (.SVG)
+                                            </a>
                                         </Button>
                                     </div>
                                     <div className="bg-muted p-6 rounded-xl text-sm text-center text-muted-foreground mt-4">
