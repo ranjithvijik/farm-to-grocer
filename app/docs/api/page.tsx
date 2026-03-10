@@ -37,13 +37,13 @@ export default function ApiDocsPage() {
                         <div className="md:col-span-1 border-r pr-4 hidden md:block">
                             <h3 className="font-bold text-sm uppercase text-muted-foreground tracking-wider mb-4">Endpoints</h3>
                             <ul className="space-y-3 font-medium text-sm">
-                                <li><a href="#" className="text-primary hover:underline">Authentication</a></li>
-                                <li><a href="#" className="hover:text-primary transition-colors">GET /products</a></li>
-                                <li><a href="#" className="hover:text-primary transition-colors">GET /products/:id</a></li>
-                                <li><a href="#" className="hover:text-primary transition-colors">POST /orders</a></li>
-                                <li><a href="#" className="hover:text-primary transition-colors">GET /orders/:id</a></li>
-                                <li><a href="#" className="hover:text-primary transition-colors">PATCH /orders/:id</a></li>
-                                <li><a href="#" className="hover:text-primary transition-colors">Webhooks</a></li>
+                                <li><a href="#authentication" className="text-primary hover:underline">Authentication</a></li>
+                                <li><a href="#get-products" className="hover:text-primary transition-colors">GET /products</a></li>
+                                <li><a href="#get-products-id" className="hover:text-primary transition-colors">GET /products/:id</a></li>
+                                <li><a href="#post-orders" className="hover:text-primary transition-colors">POST /orders</a></li>
+                                <li><a href="#get-orders-id" className="hover:text-primary transition-colors">GET /orders/:id</a></li>
+                                <li><a href="#patch-orders-id" className="hover:text-primary transition-colors">PATCH /orders/:id</a></li>
+                                <li><a href="#webhooks" className="hover:text-primary transition-colors">Webhooks</a></li>
                             </ul>
                         </div>
                         <div className="md:col-span-3 prose max-w-none">
@@ -52,12 +52,60 @@ export default function ApiDocsPage() {
                                 The Farm to Grocer API is organized around REST. Our API has predictable, resource-oriented URLs, and uses HTTP response codes to indicate API errors. We use built-in HTTP features, like HTTP authentication and HTTP verbs, which are understood by off-the-shelf HTTP clients.
                             </p>
 
-                            <h2 className="text-2xl font-bold border-b pb-2 mb-6">Authentication</h2>
+                            <h2 id="authentication" className="text-2xl font-bold border-b pb-2 mb-6">Authentication</h2>
                             <p className="text-muted-foreground mb-4">
                                 Authenticate your account when using the API by including your secret API key in the request. You can manage your API keys in the Dashboard. Your API keys carry many privileges, so be sure to keep them secure!
                             </p>
                             <div className="bg-muted rounded-md p-4 mb-8 overflow-x-auto">
                                 <pre className="text-sm font-mono text-muted-foreground"><code>Authorization: Bearer sk_live_...</code></pre>
+                            </div>
+
+                            <h2 id="get-products" className="text-2xl font-bold border-b pb-2 mb-6 mt-12">GET /products</h2>
+                            <p className="text-muted-foreground mb-4">
+                                Retrieve a list of available produce from local farmers. Supports filtering by category, farm, and proximity.
+                            </p>
+                            <div className="bg-muted rounded-md p-4 mb-8 overflow-x-auto">
+                                <pre className="text-sm font-mono text-muted-foreground"><code>GET https://api.farmtogrocer.com/v1/products?limit=10</code></pre>
+                            </div>
+
+                            <h2 id="get-products-id" className="text-2xl font-bold border-b pb-2 mb-6 mt-12">GET /products/:id</h2>
+                            <p className="text-muted-foreground mb-4">
+                                Retrieve details for a specific product, including current inventory levels and farmer information.
+                            </p>
+                            <div className="bg-muted rounded-md p-4 mb-8 overflow-x-auto">
+                                <pre className="text-sm font-mono text-muted-foreground"><code>GET https://api.farmtogrocer.com/v1/products/prod_123xyz</code></pre>
+                            </div>
+
+                            <h2 id="post-orders" className="text-2xl font-bold border-b pb-2 mb-6 mt-12">POST /orders</h2>
+                            <p className="text-muted-foreground mb-4">
+                                Create a new wholesale order for one or multiple products.
+                            </p>
+                            <div className="bg-muted rounded-md p-4 mb-8 overflow-x-auto">
+                                <pre className="text-sm font-mono text-muted-foreground"><code>POST https://api.farmtogrocer.com/v1/orders</code></pre>
+                            </div>
+
+                            <h2 id="get-orders-id" className="text-2xl font-bold border-b pb-2 mb-6 mt-12">GET /orders/:id</h2>
+                            <p className="text-muted-foreground mb-4">
+                                Retrieve the status and details of an existing order.
+                            </p>
+                            <div className="bg-muted rounded-md p-4 mb-8 overflow-x-auto">
+                                <pre className="text-sm font-mono text-muted-foreground"><code>GET https://api.farmtogrocer.com/v1/orders/ord_456abc</code></pre>
+                            </div>
+
+                            <h2 id="patch-orders-id" className="text-2xl font-bold border-b pb-2 mb-6 mt-12">PATCH /orders/:id</h2>
+                            <p className="text-muted-foreground mb-4">
+                                Update an existing order object. Often used to update order status or adjust delivery notes.
+                            </p>
+                            <div className="bg-muted rounded-md p-4 mb-8 overflow-x-auto">
+                                <pre className="text-sm font-mono text-muted-foreground"><code>PATCH https://api.farmtogrocer.com/v1/orders/ord_456abc</code></pre>
+                            </div>
+
+                            <h2 id="webhooks" className="text-2xl font-bold border-b pb-2 mb-6 mt-12">Webhooks</h2>
+                            <p className="text-muted-foreground mb-4">
+                                Listen for events on your Farm to Grocer account so your integration can automatically trigger reactions. For example, when an order's status changes to "Out for Delivery".
+                            </p>
+                            <div className="bg-muted rounded-md p-4 mb-8 overflow-x-auto">
+                                <pre className="text-sm font-mono text-muted-foreground"><code>POST https://your-domain.com/webhook-endpoint</code></pre>
                             </div>
 
                             <h2 className="text-2xl font-bold border-b pb-2 mb-6 mt-12">Pagination</h2>
