@@ -41,10 +41,10 @@ export default function MissionPage() {
                                 For decades, the agricultural supply chain has favored massive industrial consolidation. Small and mid-sized farmers work tirelessly, yet often see only cents on the dollar for their produce because of complex webs of brokers, distributors, and wholesalers.
                             </p>
                             <p className="text-lg text-muted-foreground">
-                                Meanwhile, local grocers and restaurants struggle to source truly fresh, local ingredients consistently without driving to six different farms every morning.
+                                Meanwhile, right here in Baltimore and cities like it, local grocers and restaurants struggle to source truly fresh, local ingredients consistently without driving to six different farms every morning. This disconnect contributes to "food apartheid" and under-resourced neighborhoods lacking access to fresh, healthy produce.
                             </p>
                             <p className="text-lg text-muted-foreground font-semibold text-foreground">
-                                We realized technology could bridge this gap.
+                                Witnessing the impact of the Farm Alliance of Baltimore and other urban growers, we realized technology could bridge this gap and amplify their efforts.
                             </p>
                         </div>
                         <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">

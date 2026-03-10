@@ -85,9 +85,9 @@ const socialLinks = [
 ];
 
 const contactInfo = {
-  email: "hello@farmtogrocer.com",
-  phone: "(555) 123-4567",
-  address: "123 Farm Lane, Austin, TX 78701",
+  email: "support@farmtogrocer.com",
+  phone: "(410) 555-0199",
+  address: "11 W Mt Royal Ave, Baltimore, MD 21201",
 };
 
 // ============================================

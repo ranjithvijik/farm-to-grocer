@@ -56,7 +56,7 @@ export default function ContactPage() {
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Phone</p>
-                                                <p className="text-lg">+1 (555) 123-4567</p>
+                                                <p className="text-lg">+1 (410) 555-0199</p>
                                             </div>
                                         </div>
                                         <div className="flex gap-4">
@@ -66,8 +66,8 @@ export default function ContactPage() {
                                             <div>
                                                 <p className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Office</p>
                                                 <p className="text-lg">
-                                                    123 Farm Way, Suite 400<br />
-                                                    Agricultural District, NY 10001
+                                                    11 W Mt Royal Ave<br />
+                                                    Baltimore, MD 21201
                                                 </p>
                                             </div>
                                         </div>

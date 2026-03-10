@@ -47,13 +47,11 @@ export default function AboutPage() {
                                 <h2 className="text-3xl font-bold tracking-tight">How We Started</h2>
                                 <div className="space-y-4 text-lg text-muted-foreground">
                                     <p>
-                                        Farm to Grocer was born from a simple observation: it's often harder
-                                        for a grocer to buy from a farm five miles away than from a
-                                        distributor five hundred miles away.
+                                        Farm to Grocer was born right here in Baltimore from a simple observation: despite Maryland's rich agricultural heritage and thriving urban farming network, it's often harder for a local grocer to buy from a farm just up I-83 than from a distributor five hundred miles away.
                                     </p>
                                     <p>
                                         The traditional supply chain is fragmented, inefficient, and leaves
-                                        too many small farms behind. We set out to build a platform that
+                                        too many small farms behind. Inspired by local efforts like the Homegrown Baltimore initiative and organizations such as Real Food Farm, we set out to build a platform that
                                         bridges this gap with technology, making local sourcing the
                                         standard, not the exception.
                                     </p>
