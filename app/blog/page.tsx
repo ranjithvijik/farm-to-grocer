@@ -14,7 +14,7 @@ export default function BlogPage() {
             excerpt: "Discover what city grocers are paying premium prices for this summer, and how to optimize your planting schedule.",
             category: "For Farmers",
             date: "Nov 12, 2025",
-            img: "https://images.unsplash.com/photo-1592982537447-6f2334965251?auto=format&fit=crop&q=80"
+            img: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&q=80"
         },
         {
             title: "The Ultimate Guide to Storing Root Vegetables",
@@ -35,7 +35,7 @@ export default function BlogPage() {
             excerpt: "A look into how one mid-sized sustainable farm used our marketplace to ditch wholesale and go direct to grocer.",
             category: "Case Study",
             date: "Aug 19, 2025",
-            img: "https://images.unsplash.com/photo-1530836369250-ef71a3f5e4bc?auto=format&fit=crop&q=80"
+            img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&q=80"
         },
         {
             title: "Understanding Regenerative Agriculture Certifications",
@@ -49,7 +49,7 @@ export default function BlogPage() {
             excerpt: "Simple tips to make your listings stand out to local retailers when they're sourcing ingredients.",
             category: "For Farmers",
             date: "Jun 14, 2025",
-            img: "https://images.unsplash.com/photo-1595856453085-f53835061690?auto=format&fit=crop&q=80"
+            img: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&q=80"
         }
     ];
 
