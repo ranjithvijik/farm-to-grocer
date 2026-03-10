@@ -363,8 +363,6 @@ git clone https://github.com/your-org/farm-to-grocer.git
 cd farm-to-grocer
 
 # 2. Install dependencies
-npm install
-# or
 pnpm install
 
 # 3. Set up environment variables
@@ -372,14 +370,13 @@ cp .env.example .env.local
 # Edit .env.local with your values
 
 # 4. Set up the database
-npx prisma generate
-npx prisma db push
+pnpm db:push
 
 # 5. (Optional) Seed with sample data
-npx prisma db seed
+pnpm db:seed
 
 # 6. Start the development server
-npm run dev
+pnpm dev
 
 # 7. Open http://localhost:3000
 ```
@@ -448,32 +445,32 @@ npx prisma db push
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server (port 3000) |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run lint:fix` | Fix ESLint errors |
-| `npm run format` | Format code with Prettier |
-| `npm run type-check` | TypeScript type checking |
-| `npm run db:generate` | Generate Prisma client |
-| `npm run db:push` | Push schema to database |
-| `npm run db:migrate` | Run migrations |
-| `npm run db:studio` | Open Prisma Studio |
-| `npm run db:seed` | Seed database |
-| `npm run test` | Run tests |
-| `npm run test:watch` | Run tests in watch mode |
+| `pnpm dev` | Start development server (port 3000) |
+| `pnpm build` | Build for production |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run ESLint |
+| `pnpm lint:fix` | Fix ESLint errors |
+| `pnpm format` | Format code with Prettier |
+| `pnpm typecheck` | TypeScript type checking |
+| `pnpm db:generate` | Generate Prisma client |
+| `pnpm db:push` | Push schema to database |
+| `pnpm db:migrate` | Run migrations |
+| `pnpm db:studio` | Open Prisma Studio |
+| `pnpm db:seed` | Seed database |
+| `pnpm test` | Run tests |
+| `pnpm test:watch` | Run tests in watch mode |
 
 ### Code Style
 
 ```bash
 # Check linting
-npm run lint
+pnpm lint
 
 # Fix linting errors
-npm run lint:fix
+pnpm lint:fix
 
 # Format all files
-npm run format
+pnpm format
 ```
 
 ---
@@ -601,20 +598,20 @@ git clone https://github.com/your-org/farm-to-grocer.git
 cd farm-to-grocer
 
 # 2. Install dependencies
-npm ci
+pnpm install
 
 # 3. Build
-npm run build
+pnpm build
 
 # 4. Set up environment
 cp .env.example .env.local
 nano .env.local
 
 # 5. Run migrations
-npx prisma db push
+pnpm db:push
 
 # 6. Start with PM2
-pm2 start npm --name "farm-to-grocer" -- start
+pm2 start pnpm --name "farm-to-grocer" -- start
 pm2 save
 ```
 
