@@ -1,45 +1,13 @@
-// Farm-to-Grocer MVP - NextAuth.js API Route Handler
-// Path: app/api/auth/[...nextauth]/route.ts
-//
-// This file handles all authentication requests via NextAuth.js
-// Using Next.js 14 App Router with Route Handlers
+// Legacy NextAuth route - no longer used.
+// Auth is now handled client-side via AuthProvider (Cognito / dev-mode mock).
+// This file exists to prevent 404s on /api/auth/* requests.
 
-import NextAuth from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
-// ============================================
-// NEXTAUTH ROUTE HANDLER
-// ============================================
+export async function GET() {
+  return NextResponse.json({ message: "Auth is handled client-side" });
+}
 
-/**
- * NextAuth.js Route Handler
- * 
- * Handles all authentication routes:
- * - GET /api/auth/signin - Sign in page
- * - POST /api/auth/signin/:provider - Sign in with provider
- * - GET /api/auth/signout - Sign out page
- * - POST /api/auth/signout - Sign out action
- * - GET /api/auth/session - Get session
- * - GET /api/auth/csrf - Get CSRF token
- * - GET /api/auth/providers - Get available providers
- * - GET /api/auth/callback/:provider - OAuth callback
- * - POST /api/auth/callback/credentials - Credentials callback
- */
-const handler = NextAuth(authOptions);
-
-// Export handlers for App Router
-export { handler as GET, handler as POST };
-
-// ============================================
-// ADDITIONAL EXPORTS (Optional)
-// ============================================
-
-/**
- * Export auth options for use in other files
- * This allows importing authOptions from this file if needed
- * 
- * Usage:
- * import { authOptions } from "@/app/api/auth/[...nextauth]/route";
- * const session = await getServerSession(authOptions);
- */
-export { authOptions };
+export async function POST() {
+  return NextResponse.json({ message: "Auth is handled client-side" });
+}

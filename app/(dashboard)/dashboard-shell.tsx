@@ -1,21 +1,10 @@
-// Farm-to-Grocer MVP - Dashboard Shell Component
-// Path: app/(dashboard)/dashboard-shell.tsx
-//
-// A comprehensive dashboard shell with:
-// - Collapsible sidebar navigation
-// - Role-based menu items (Farmer/Grocer/Admin)
-// - Top header with search, notifications, user menu
-// - Mobile-responsive with slide-out drawer
-// - Breadcrumb navigation
-// - Keyboard shortcuts
-// - Persistent sidebar state
-
 "use client";
 
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { useAuth } from "@/lib/auth-context";
+import type { AuthUser } from "@/lib/auth-context";
 import {
   LayoutDashboard,
   Package,
@@ -36,37 +25,26 @@ import {
   Leaf,
   Store,
   TrendingUp,
-  Truck,
-  CreditCard,
-  FileText,
-  BarChart3,
-  Heart,
-  Shield,
+  DollarSign,
+  Megaphone,
+  MessageSquare,
   User,
+  Shield,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
 // ============================================
-// TYPES & INTERFACES
+// TYPES
 // ============================================
 
-interface SessionUser {
-  id: string;
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-  role: "FARMER" | "GROCER" | "ADMIN";
-  farmerId?: string;
-  grocerId?: string;
-}
+type SessionUser = AuthUser;
 
 interface NavItem {
   title: string;
   href: string;
   icon: React.ReactNode;
   badge?: number;
-  children?: NavItem[];
 }
 
 interface DashboardShellProps {
@@ -75,139 +53,38 @@ interface DashboardShellProps {
 }
 
 // ============================================
-// NAVIGATION CONFIGURATION
+// NAVIGATION CONFIGURATION (per requirements)
 // ============================================
 
 const farmerNavItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    href: "/farmer",
-    icon: <LayoutDashboard className="h-5 w-5" />,
-  },
-  {
-    title: "Products",
-    href: "/farmer/products",
-    icon: <Package className="h-5 w-5" />,
-    children: [
-      { title: "All Products", href: "/farmer/products", icon: <Package className="h-4 w-4" /> },
-      { title: "Add New", href: "/farmer/products/new", icon: <Package className="h-4 w-4" /> },
-      { title: "Categories", href: "/farmer/products/categories", icon: <Package className="h-4 w-4" /> },
-    ],
-  },
-  {
-    title: "Orders",
-    href: "/farmer/orders",
-    icon: <ShoppingCart className="h-5 w-5" />,
-  },
-  {
-    title: "Customers",
-    href: "/farmer/customers",
-    icon: <Users className="h-5 w-5" />,
-  },
-  {
-    title: "Analytics",
-    href: "/farmer/analytics",
-    icon: <BarChart3 className="h-5 w-5" />,
-  },
-  {
-    title: "Payments",
-    href: "/farmer/payments",
-    icon: <CreditCard className="h-5 w-5" />,
-  },
-  {
-    title: "Deliveries",
-    href: "/farmer/deliveries",
-    icon: <Truck className="h-5 w-5" />,
-  },
+  { title: "Dashboard", href: "/farmer", icon: <LayoutDashboard className="h-5 w-5" /> },
+  { title: "Storefront", href: "/farmer/storefront", icon: <Store className="h-5 w-5" /> },
+  { title: "Products", href: "/farmer/products", icon: <Package className="h-5 w-5" /> },
+  { title: "Orders", href: "/farmer/orders", icon: <ShoppingCart className="h-5 w-5" /> },
+  { title: "Customers", href: "/farmer/customers", icon: <Users className="h-5 w-5" /> },
+  { title: "Sales Hub", href: "/farmer/sales", icon: <TrendingUp className="h-5 w-5" /> },
+  { title: "Marketing", href: "/farmer/marketing", icon: <Megaphone className="h-5 w-5" /> },
+  { title: "Finance", href: "/farmer/finance", icon: <DollarSign className="h-5 w-5" /> },
+  { title: "Messages", href: "/farmer/messages", icon: <MessageSquare className="h-5 w-5" /> },
+  { title: "Settings", href: "/farmer/settings", icon: <Settings className="h-5 w-5" /> },
 ];
 
 const grocerNavItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    href: "/grocer",
-    icon: <LayoutDashboard className="h-5 w-5" />,
-  },
-  {
-    title: "Browse Products",
-    href: "/grocer/browse",
-    icon: <Search className="h-5 w-5" />,
-  },
-  {
-    title: "Orders",
-    href: "/grocer/orders",
-    icon: <ShoppingCart className="h-5 w-5" />,
-  },
-  {
-    title: "Favorites",
-    href: "/grocer/favorites",
-    icon: <Heart className="h-5 w-5" />,
-  },
-  {
-    title: "Suppliers",
-    href: "/grocer/suppliers",
-    icon: <Leaf className="h-5 w-5" />,
-  },
-  {
-    title: "Spending",
-    href: "/grocer/spending",
-    icon: <TrendingUp className="h-5 w-5" />,
-  },
-  {
-    title: "Deliveries",
-    href: "/grocer/deliveries",
-    icon: <Truck className="h-5 w-5" />,
-  },
+  { title: "Dashboard", href: "/grocer", icon: <LayoutDashboard className="h-5 w-5" /> },
+  { title: "Browse", href: "/grocer/browse", icon: <Store className="h-5 w-5" /> },
+  { title: "Orders", href: "/grocer/orders", icon: <ShoppingCart className="h-5 w-5" /> },
+  { title: "Finance", href: "/grocer/finance", icon: <DollarSign className="h-5 w-5" /> },
+  { title: "Messages", href: "/grocer/messages", icon: <MessageSquare className="h-5 w-5" /> },
+  { title: "Settings", href: "/grocer/settings", icon: <Settings className="h-5 w-5" /> },
 ];
 
 const adminNavItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    href: "/admin",
-    icon: <LayoutDashboard className="h-5 w-5" />,
-  },
-  {
-    title: "Users",
-    href: "/admin/users",
-    icon: <Users className="h-5 w-5" />,
-  },
-  {
-    title: "Farmers",
-    href: "/admin/farmers",
-    icon: <Leaf className="h-5 w-5" />,
-  },
-  {
-    title: "Grocers",
-    href: "/admin/grocers",
-    icon: <Store className="h-5 w-5" />,
-  },
-  {
-    title: "Orders",
-    href: "/admin/orders",
-    icon: <ShoppingCart className="h-5 w-5" />,
-  },
-  {
-    title: "Reports",
-    href: "/admin/reports",
-    icon: <FileText className="h-5 w-5" />,
-  },
-  {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: <Settings className="h-5 w-5" />,
-  },
-];
-
-const bottomNavItems: NavItem[] = [
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: <Settings className="h-5 w-5" />,
-  },
-  {
-    title: "Help & Support",
-    href: "/help",
-    icon: <HelpCircle className="h-5 w-5" />,
-  },
+  { title: "Dashboard", href: "/admin", icon: <LayoutDashboard className="h-5 w-5" /> },
+  { title: "Users", href: "/admin/users", icon: <Users className="h-5 w-5" /> },
+  { title: "Farmers", href: "/admin/farmers", icon: <Leaf className="h-5 w-5" /> },
+  { title: "Grocers", href: "/admin/grocers", icon: <Store className="h-5 w-5" /> },
+  { title: "Orders", href: "/admin/orders", icon: <ShoppingCart className="h-5 w-5" /> },
+  { title: "Settings", href: "/admin/settings", icon: <Settings className="h-5 w-5" /> },
 ];
 
 // ============================================
@@ -217,59 +94,44 @@ const bottomNavItems: NavItem[] = [
 export function DashboardShell({ children, user }: DashboardShellProps) {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const { signOut: authSignOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = React.useState("");
   const [notificationsOpen, setNotificationsOpen] = React.useState(false);
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
 
   const userMenuRef = React.useRef<HTMLDivElement>(null);
   const notificationsRef = React.useRef<HTMLDivElement>(null);
 
-  // Get navigation items based on user role
   const navItems = React.useMemo(() => {
     switch (user.role) {
-      case "FARMER":
-        return farmerNavItems;
-      case "GROCER":
-        return grocerNavItems;
-      case "ADMIN":
-        return adminNavItems;
-      default:
-        return [];
+      case "FARMER": return farmerNavItems;
+      case "GROCER": return grocerNavItems;
+      case "ADMIN": return adminNavItems;
+      default: return [];
     }
   }, [user.role]);
 
   // Load sidebar state from localStorage
   React.useEffect(() => {
     const savedState = localStorage.getItem("sidebar-open");
-    if (savedState !== null) {
-      setSidebarOpen(JSON.parse(savedState));
-    }
+    if (savedState !== null) setSidebarOpen(JSON.parse(savedState));
   }, []);
 
-  // Save sidebar state to localStorage
+  // Save sidebar state
   React.useEffect(() => {
     localStorage.setItem("sidebar-open", JSON.stringify(sidebarOpen));
   }, [sidebarOpen]);
 
   // Close mobile menu on route change
-  React.useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
+  React.useEffect(() => { setMobileMenuOpen(false); }, [pathname]);
 
   // Close dropdowns when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setUserMenuOpen(false);
-      }
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-        setNotificationsOpen(false);
-      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) setUserMenuOpen(false);
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) setNotificationsOpen(false);
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -277,53 +139,35 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   // Keyboard shortcuts
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Toggle sidebar with Cmd/Ctrl + B
       if ((event.metaKey || event.ctrlKey) && event.key === "b") {
         event.preventDefault();
         setSidebarOpen((prev) => !prev);
       }
-      // Focus search with Cmd/Ctrl + K
       if ((event.metaKey || event.ctrlKey) && event.key === "k") {
         event.preventDefault();
         document.getElementById("dashboard-search")?.focus();
       }
     };
-
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Toggle expanded menu item
-  const toggleExpanded = (title: string) => {
-    setExpandedItems((prev) =>
-      prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]
-    );
-  };
-
-  // Check if link is active
   const isActiveLink = (href: string) => {
-    if (href === `/${user.role.toLowerCase()}`) {
-      return pathname === href;
-    }
+    if (href === `/${user.role.toLowerCase()}`) return pathname === href;
     return pathname.startsWith(href);
   };
 
-  // Handle sign out
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" });
+    await authSignOut();
+    window.location.href = "/";
   };
 
-  // Get role display info
   const getRoleInfo = () => {
     switch (user.role) {
-      case "FARMER":
-        return { label: "Farmer", icon: <Leaf className="h-3 w-3" />, color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300" };
-      case "GROCER":
-        return { label: "Grocer", icon: <Store className="h-3 w-3" />, color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300" };
-      case "ADMIN":
-        return { label: "Admin", icon: <Shield className="h-3 w-3" />, color: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300" };
-      default:
-        return { label: "User", icon: <User className="h-3 w-3" />, color: "bg-gray-100 text-gray-800" };
+      case "FARMER": return { label: "Farmer", icon: <Leaf className="h-3 w-3" />, color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300" };
+      case "GROCER": return { label: "Grocer", icon: <Store className="h-3 w-3" />, color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300" };
+      case "ADMIN": return { label: "Admin", icon: <Shield className="h-3 w-3" />, color: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300" };
+      default: return { label: "User", icon: <User className="h-3 w-3" />, color: "bg-gray-100 text-gray-800" };
     }
   };
 
@@ -331,26 +175,25 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* ════════════════════════════════════════════════════════════
-          SIDEBAR (Desktop)
-      ════════════════════════════════════════════════════════════ */}
+      {/* ═══ SIDEBAR (Desktop) ═══ */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen bg-card border-r border-border transition-all duration-300 ease-in-out",
+          "fixed left-0 top-0 z-40 h-screen transition-all duration-300 ease-in-out",
           "hidden lg:flex lg:flex-col",
+          "bg-[#0F172A] text-white",
           sidebarOpen ? "w-64" : "w-20"
         )}
       >
         {/* Sidebar Header */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-border">
+        <div className="flex h-16 items-center justify-between px-4 border-b border-white/10">
           <Link
             href={`/${user.role.toLowerCase()}`}
             className={cn(
-              "flex items-center gap-2 font-bold text-primary transition-opacity",
+              "flex items-center gap-2 font-bold transition-opacity text-white",
               !sidebarOpen && "justify-center"
             )}
           >
-            <Leaf className="h-7 w-7 flex-shrink-0" />
+            <Leaf className="h-7 w-7 flex-shrink-0 text-green-400" />
             {sidebarOpen && <span className="text-lg">Farm to Grocer</span>}
           </Link>
         </div>
@@ -360,107 +203,53 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
           <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.title}>
-                {item.children ? (
-                  // Expandable menu item
-                  <div>
-                    <button
-                      onClick={() => toggleExpanded(item.title)}
-                      className={cn(
-                        "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                        "hover:bg-accent hover:text-accent-foreground",
-                        isActiveLink(item.href) && "bg-primary/10 text-primary",
-                        !sidebarOpen && "justify-center"
-                      )}
-                    >
-                      {item.icon}
-                      {sidebarOpen && (
-                        <>
-                          <span className="flex-1 text-left">{item.title}</span>
-                          <ChevronDown
-                            className={cn(
-                              "h-4 w-4 transition-transform",
-                              expandedItems.includes(item.title) && "rotate-180"
-                            )}
-                          />
-                        </>
-                      )}
-                    </button>
-                    {sidebarOpen && expandedItems.includes(item.title) && (
-                      <ul className="mt-1 ml-4 space-y-1 border-l border-border pl-4">
-                        {item.children.map((child) => (
-                          <li key={child.href}>
-                            <Link
-                              href={child.href}
-                              className={cn(
-                                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
-                                "hover:bg-accent hover:text-accent-foreground",
-                                isActiveLink(child.href) && "bg-primary/10 text-primary font-medium"
-                              )}
-                            >
-                              {child.title}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ) : (
-                  // Regular menu item
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                      "hover:bg-accent hover:text-accent-foreground",
-                      isActiveLink(item.href) && "bg-primary/10 text-primary",
-                      !sidebarOpen && "justify-center"
-                    )}
-                    title={!sidebarOpen ? item.title : undefined}
-                  >
-                    {item.icon}
-                    {sidebarOpen && <span>{item.title}</span>}
-                    {item.badge && sidebarOpen && (
-                      <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                        {item.badge}
-                      </span>
-                    )}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-
-          {/* Divider */}
-          <div className="my-4 border-t border-border" />
-
-          {/* Bottom Navigation */}
-          <ul className="space-y-1">
-            {bottomNavItems.map((item) => (
-              <li key={item.title}>
                 <Link
                   href={item.href}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                    "hover:bg-accent hover:text-accent-foreground text-muted-foreground",
-                    isActiveLink(item.href) && "bg-primary/10 text-primary",
+                    "hover:bg-white/10",
+                    isActiveLink(item.href)
+                      ? "bg-green-600/20 text-green-400 border-l-2 border-green-400"
+                      : "text-slate-300",
                     !sidebarOpen && "justify-center"
                   )}
                   title={!sidebarOpen ? item.title : undefined}
                 >
                   {item.icon}
                   {sidebarOpen && <span>{item.title}</span>}
+                  {item.badge && sidebarOpen && (
+                    <span className="ml-auto rounded-full bg-green-500 px-2 py-0.5 text-xs text-white">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}
           </ul>
         </nav>
 
-        {/* Sidebar Footer - Collapse Toggle */}
-        <div className="border-t border-border p-3">
+        {/* User Info at Bottom */}
+        {sidebarOpen && (
+          <div className="border-t border-white/10 p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-full bg-green-600/20 flex items-center justify-center flex-shrink-0">
+                <User className="h-4 w-4 text-green-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                <p className="text-xs text-slate-400 truncate">{user.email}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Collapse Toggle */}
+        <div className="border-t border-white/10 p-3">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className={cn(
               "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              "hover:bg-accent hover:text-accent-foreground text-muted-foreground",
+              "hover:bg-white/10 text-slate-400",
               !sidebarOpen && "justify-center"
             )}
           >
@@ -476,9 +265,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         </div>
       </aside>
 
-      {/* ════════════════════════════════════════════════════════════
-          MOBILE SIDEBAR OVERLAY
-      ════════════════════════════════════════════════════════════ */}
+      {/* ═══ MOBILE OVERLAY ═══ */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
@@ -486,30 +273,24 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         />
       )}
 
-      {/* ════════════════════════════════════════════════════════════
-          MOBILE SIDEBAR DRAWER
-      ════════════════════════════════════════════════════════════ */}
+      {/* ═══ MOBILE DRAWER ═══ */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 h-screen w-72 bg-card border-r border-border transition-transform duration-300 ease-in-out lg:hidden",
+          "fixed left-0 top-0 z-50 h-screen w-72 transition-transform duration-300 ease-in-out lg:hidden",
+          "bg-[#0F172A] text-white",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        {/* Mobile Sidebar Header */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-border">
-          <Link href={`/${user.role.toLowerCase()}`} className="flex items-center gap-2 font-bold text-primary">
-            <Leaf className="h-7 w-7" />
+        <div className="flex h-16 items-center justify-between px-4 border-b border-white/10">
+          <Link href={`/${user.role.toLowerCase()}`} className="flex items-center gap-2 font-bold text-white">
+            <Leaf className="h-7 w-7 text-green-400" />
             <span className="text-lg">Farm to Grocer</span>
           </Link>
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className="rounded-md p-2 hover:bg-accent"
-          >
+          <button onClick={() => setMobileMenuOpen(false)} className="rounded-md p-2 hover:bg-white/10 text-slate-300">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Mobile Navigation */}
         <nav className="flex-1 overflow-y-auto py-4 px-3">
           <ul className="space-y-1">
             {navItems.map((item) => (
@@ -519,33 +300,8 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    isActiveLink(item.href) && "bg-primary/10 text-primary"
-                  )}
-                >
-                  {item.icon}
-                  <span>{item.title}</span>
-                  {item.badge && (
-                    <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <div className="my-4 border-t border-border" />
-
-          <ul className="space-y-1">
-            {bottomNavItems.map((item) => (
-              <li key={item.title}>
-                <Link
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors",
-                    "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
+                    "hover:bg-white/10",
+                    isActiveLink(item.href) ? "bg-green-600/20 text-green-400" : "text-slate-300"
                   )}
                 >
                   {item.icon}
@@ -556,24 +312,19 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
           </ul>
         </nav>
 
-        {/* Mobile User Info */}
-        <div className="border-t border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              {user.image ? (
-                <img src={user.image} alt={user.name || ""} className="h-10 w-10 rounded-full object-cover" />
-              ) : (
-                <User className="h-5 w-5 text-primary" />
-              )}
+        <div className="border-t border-white/10 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-10 w-10 rounded-full bg-green-600/20 flex items-center justify-center">
+              <User className="h-5 w-5 text-green-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              <p className="text-sm font-medium text-white truncate">{user.name}</p>
+              <p className="text-xs text-slate-400 truncate">{user.email}</p>
             </div>
           </div>
           <button
             onClick={handleSignOut}
-            className="mt-3 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
           >
             <LogOut className="h-4 w-4" />
             Sign Out
@@ -581,24 +332,11 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         </div>
       </aside>
 
-      {/* ════════════════════════════════════════════════════════════
-          MAIN CONTENT AREA
-      ════════════════════════════════════════════════════════════ */}
-      <div
-        className={cn(
-          "min-h-screen transition-all duration-300 ease-in-out",
-          sidebarOpen ? "lg:ml-64" : "lg:ml-20"
-        )}
-      >
-        {/* ════════════════════════════════════════════════════════════
-            TOP HEADER
-        ════════════════════════════════════════════════════════════ */}
+      {/* ═══ MAIN CONTENT AREA ═══ */}
+      <div className={cn("min-h-screen transition-all duration-300 ease-in-out", sidebarOpen ? "lg:ml-64" : "lg:ml-20")}>
+        {/* ═══ TOP HEADER ═══ */}
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card/95 backdrop-blur-sm px-4 lg:px-6">
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="rounded-md p-2 hover:bg-accent lg:hidden"
-          >
+          <button onClick={() => setMobileMenuOpen(true)} className="rounded-md p-2 hover:bg-accent lg:hidden">
             <Menu className="h-5 w-5" />
           </button>
 
@@ -609,31 +347,21 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
               <input
                 id="dashboard-search"
                 type="search"
-                placeholder="Search... (⌘K)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={cn(
-                  "w-full rounded-lg border border-input bg-background pl-10 pr-4 py-2 text-sm",
-                  "placeholder:text-muted-foreground",
-                  "focus:outline-none focus:ring-2 focus:ring-ring"
-                )}
+                placeholder="Search... (Cmd+K)"
+                className="w-full rounded-lg border border-input bg-background pl-10 pr-4 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
 
-          {/* Right Side Actions */}
+          {/* Right Actions */}
           <div className="flex items-center gap-2">
-            {/* Theme Toggle */}
+            {/* Dark Mode Toggle */}
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="rounded-md p-2 hover:bg-accent transition-colors"
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
 
             {/* Notifications */}
@@ -647,7 +375,6 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                 <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
               </button>
 
-              {/* Notifications Dropdown */}
               {notificationsOpen && (
                 <div className="absolute right-0 top-full mt-2 w-80 rounded-lg border border-border bg-card shadow-lg">
                   <div className="flex items-center justify-between p-4 border-b border-border">
@@ -655,7 +382,6 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                     <button className="text-xs text-primary hover:underline">Mark all read</button>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
-                    {/* Sample notifications */}
                     <div className="p-4 hover:bg-accent/50 cursor-pointer border-b border-border">
                       <p className="text-sm font-medium">New order received</p>
                       <p className="text-xs text-muted-foreground mt-1">Order #1234 from Fresh Market</p>
@@ -666,14 +392,6 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                       <p className="text-xs text-muted-foreground mt-1">$245.00 deposited to your account</p>
                       <p className="text-xs text-muted-foreground mt-1">1 hour ago</p>
                     </div>
-                  </div>
-                  <div className="p-3 border-t border-border">
-                    <Link
-                      href="/notifications"
-                      className="block text-center text-sm text-primary hover:underline"
-                    >
-                      View all notifications
-                    </Link>
                   </div>
                 </div>
               )}
@@ -686,11 +404,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-accent transition-colors"
               >
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  {user.image ? (
-                    <img src={user.image} alt={user.name || ""} className="h-8 w-8 rounded-full object-cover" />
-                  ) : (
-                    <User className="h-4 w-4 text-primary" />
-                  )}
+                  <User className="h-4 w-4 text-primary" />
                 </div>
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-medium truncate max-w-[120px]">{user.name}</p>
@@ -702,44 +416,24 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
                 <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
               </button>
 
-              {/* User Dropdown */}
               {userMenuOpen && (
                 <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-border bg-card shadow-lg py-1">
                   <div className="px-4 py-3 border-b border-border">
                     <p className="text-sm font-medium truncate">{user.name}</p>
                     <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent transition-colors"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <User className="h-4 w-4" />
-                    Profile
+                  <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent transition-colors" onClick={() => setUserMenuOpen(false)}>
+                    <User className="h-4 w-4" /> Profile
                   </Link>
-                  <Link
-                    href="/settings"
-                    className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent transition-colors"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <Settings className="h-4 w-4" />
-                    Settings
+                  <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent transition-colors" onClick={() => setUserMenuOpen(false)}>
+                    <Settings className="h-4 w-4" /> Settings
                   </Link>
-                  <Link
-                    href="/help"
-                    className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent transition-colors"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <HelpCircle className="h-4 w-4" />
-                    Help & Support
+                  <Link href="/help" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-accent transition-colors" onClick={() => setUserMenuOpen(false)}>
+                    <HelpCircle className="h-4 w-4" /> Help & Support
                   </Link>
                   <div className="border-t border-border my-1" />
-                  <button
-                    onClick={handleSignOut}
-                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Sign Out
+                  <button onClick={handleSignOut} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors">
+                    <LogOut className="h-4 w-4" /> Sign Out
                   </button>
                 </div>
               )}
@@ -747,17 +441,11 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
           </div>
         </header>
 
-        {/* ════════════════════════════════════════════════════════════
-            PAGE CONTENT
-        ════════════════════════════════════════════════════════════ */}
+        {/* ═══ PAGE CONTENT ═══ */}
         <main className="flex-1">{children}</main>
       </div>
     </div>
   );
 }
-
-// ============================================
-// EXPORTS
-// ============================================
 
 export default DashboardShell;

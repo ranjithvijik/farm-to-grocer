@@ -9,9 +9,6 @@
 // - Appeal process information
 
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import {
   AlertOctagon,
@@ -40,25 +37,9 @@ export const metadata: Metadata = {
 // SUSPENDED PAGE COMPONENT
 // ============================================
 
-export default async function SuspendedPage() {
-  // Get the user session
-  const session = await getServerSession(authOptions);
-
-  // Redirect to login if not authenticated
-  if (!session?.user) {
-    redirect("/login");
-  }
-
-  // If user is not suspended, redirect to appropriate dashboard
-  if (session.user.status !== "SUSPENDED") {
-    const redirectPath =
-      session.user.status === "PENDING"
-        ? "/onboarding"
-        : session.user.role === "FARMER"
-          ? "/farmer"
-          : "/grocer";
-    redirect(redirectPath);
-  }
+export default function SuspendedPage() {
+  // In dev mode, this is a simple static page. Auth checks are client-side.
+  const session = { user: { name: "User", email: "user@example.com" } };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-red-950/30 dark:via-background dark:to-orange-950/30">

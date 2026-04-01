@@ -14,7 +14,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useAuth } from "@/lib/auth-context";
 import {
   Menu,
   X,
@@ -102,7 +102,7 @@ export interface NavbarProps {
 
 export function Navbar({ transparent = false, fixed = true, className }: NavbarProps) {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated, signOut: authSignOut } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -110,9 +110,8 @@ export function Navbar({ transparent = false, fixed = true, className }: NavbarP
   const userMenuRef = React.useRef<HTMLDivElement>(null);
 
   // Determine user role and navigation links
-  const userRole = session?.user?.role;
-  const isAuthenticated = status === "authenticated";
-  const isLoading = status === "loading";
+  const userRole = user?.role;
+  const session = { user }; // Compatibility shim
 
   const roleLinks = userRole === "FARMER" ? farmerLinks : userRole === "GROCER" ? grocerLinks : [];
 
@@ -165,7 +164,8 @@ export function Navbar({ transparent = false, fixed = true, className }: NavbarP
 
   // Handle sign out
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" });
+    await authSignOut();
+    window.location.href = "/";
   };
 
   return (

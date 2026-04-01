@@ -1,59 +1,34 @@
-// Farm-to-Grocer MVP - Onboarding Page
-// Path: app/onboarding/page.tsx
-//
-// A comprehensive multi-step onboarding flow with:
-// - Role selection (Farmer/Grocer)
-// - Business information collection
-// - Address/location setup
-// - Profile completion
-// - Progress indicator
-// - Form validation with Zod
-// - Server actions for data persistence
+"use client";
 
-import { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { OnboardingWizard } from "./onboarding-wizard";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 import { Leaf } from "lucide-react";
 
-// ============================================
-// METADATA
-// ============================================
+export default function OnboardingPage() {
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
 
-export const metadata: Metadata = {
-  title: "Complete Your Profile",
-  description: "Set up your Farm to Grocer account to start connecting with local partners.",
-};
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login?callbackUrl=/onboarding");
+    }
+    if (!isLoading && user?.status === "ACTIVE") {
+      const redirectPath = user.role === "FARMER" ? "/farmer" : "/grocer";
+      router.push(redirectPath);
+    }
+  }, [isLoading, isAuthenticated, user, router]);
 
-// ============================================
-// ONBOARDING PAGE COMPONENT
-// ============================================
-
-export default async function OnboardingPage() {
-  // Get the user session
-  const session = await getServerSession(authOptions);
-
-  // Redirect to login if not authenticated
-  if (!session?.user) {
-    redirect("/login?callbackUrl=/onboarding");
-  }
-
-  // If user has already completed onboarding, redirect to dashboard
-  if (session.user.status === "ACTIVE") {
-    const redirectPath = session.user.role === "FARMER" ? "/farmer" : "/grocer";
-    redirect(redirectPath);
+  if (isLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-farm-50 via-white to-green-50 dark:from-farm-950 dark:via-background dark:to-green-950">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-farm-200/30 blur-3xl" />
-        <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-green-200/30 blur-3xl" />
-      </div>
-
-      {/* Header */}
       <header className="relative z-10 border-b border-border/50 bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-primary font-bold text-xl">
@@ -61,14 +36,24 @@ export default async function OnboardingPage() {
             <span>Farm to Grocer</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Welcome, <span className="font-medium text-foreground">{session.user.name}</span>
+            Welcome, <span className="font-medium text-foreground">{user.name}</span>
           </p>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="relative z-10 container mx-auto px-4 py-8 md:py-12">
-        <OnboardingWizard user={session.user} />
+        <div className="max-w-lg mx-auto text-center">
+          <h1 className="text-2xl font-bold mb-4">Complete Your Profile</h1>
+          <p className="text-muted-foreground mb-8">
+            Your account is set up. Head to your dashboard to get started.
+          </p>
+          <button
+            onClick={() => router.push(user.role === "FARMER" ? "/farmer" : "/grocer")}
+            className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
+          >
+            Go to Dashboard
+          </button>
+        </div>
       </main>
     </div>
   );

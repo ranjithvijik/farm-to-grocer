@@ -1,174 +1,11 @@
-// Farm-to-Grocer MVP - Next.js Middleware
-// Path: middleware.ts
-//
-// This middleware handles:
-// - Route protection (authentication required)
-// - Role-based access control (RBAC)
-// - Redirect logic for authenticated/unauthenticated users
-// - Security headers
-// - Rate limiting headers (for use with edge functions)
-// - Locale/i18n detection (optional)
+// Farm-to-Grocer - Next.js Middleware
+// In dev mode (NEXT_PUBLIC_DEV_AUTH=true), auth is handled client-side.
+// This middleware only applies security headers.
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
 
-// ============================================
-// CONFIGURATION
-// ============================================
-
-/**
- * Routes that require authentication
- */
-const protectedRoutes = [
-  "/farmer",
-  "/farmer/:path*",
-  "/grocer",
-  "/grocer/:path*",
-  "/admin",
-  "/admin/:path*",
-  "/settings",
-  "/settings/:path*",
-  "/onboarding",
-  "/onboarding/:path*",
-];
-
-/**
- * Routes that are only accessible to unauthenticated users
- * Authenticated users will be redirected to their dashboard
- */
-const authRoutes = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-];
-
-/**
- * Public routes that don't require authentication
- */
-const publicRoutes = [
-  "/",
-  "/about",
-  "/contact",
-  "/pricing",
-  "/faq",
-  "/help",
-  "/terms",
-  "/privacy",
-  "/cookies",
-  "/accessibility",
-  "/for-farmers",
-  "/for-grocers",
-  "/how-it-works",
-  "/marketplace",
-  "/blog",
-  "/blog/:path*",
-];
-
-/**
- * API routes that should bypass middleware
- */
-const apiRoutes = [
-  "/api/auth/:path*",
-  "/api/webhooks/:path*",
-  "/api/health",
-  "/api/public/:path*",
-];
-
-/**
- * Static assets and Next.js internals to skip
- */
-const skipPaths = [
-  "/_next",
-  "/favicon.ico",
-  "/images",
-  "/fonts",
-  "/icons",
-  "/manifest.json",
-  "/robots.txt",
-  "/sitemap.xml",
-];
-
-/**
- * Role-based route access configuration
- */
-const roleRoutes: Record<string, string[]> = {
-  FARMER: ["/farmer", "/farmer/:path*", "/settings", "/settings/:path*"],
-  GROCER: ["/grocer", "/grocer/:path*", "/settings", "/settings/:path*"],
-  ADMIN: ["/admin", "/admin/:path*", "/farmer", "/farmer/:path*", "/grocer", "/grocer/:path*", "/settings", "/settings/:path*"],
-};
-
-/**
- * Default redirect paths per role
- */
-const roleDefaultPaths: Record<string, string> = {
-  FARMER: "/farmer",
-  GROCER: "/grocer",
-  ADMIN: "/admin",
-};
-
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-
-/**
- * Check if a path matches a pattern (supports :path* wildcards)
- */
-function matchesPattern(path: string, pattern: string): boolean {
-  // Convert pattern to regex
-  const regexPattern = pattern
-    .replace(/\//g, "\\/") // Escape forward slashes
-    .replace(/:path\*/g, ".*"); // Convert :path* to .*
-
-  const regex = new RegExp(`^${regexPattern}$`);
-  return regex.test(path);
-}
-
-/**
- * Check if path matches any pattern in the list
- */
-function matchesAnyPattern(path: string, patterns: string[]): boolean {
-  return patterns.some((pattern) => matchesPattern(path, pattern));
-}
-
-/**
- * Check if user has access to a route based on their role
- */
-function hasRoleAccess(role: string, path: string): boolean {
-  const allowedRoutes = roleRoutes[role];
-  if (!allowedRoutes) return false;
-  return matchesAnyPattern(path, allowedRoutes);
-}
-
-/**
- * Get the default redirect path for a role
- */
-function getDefaultPathForRole(role: string): string {
-  return roleDefaultPaths[role] || "/";
-}
-
-/**
- * Add security headers to response
- */
 function addSecurityHeaders(response: NextResponse): NextResponse {
-  // Content Security Policy
-  response.headers.set(
-    "Content-Security-Policy",
-    [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https: http:",
-      "font-src 'self' https://fonts.gstatic.com",
-      "connect-src 'self' https://www.google-analytics.com https://vitals.vercel-insights.com",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; ")
-  );
-
-  // Other security headers
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -177,172 +14,25 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=(self), interest-cohort=()"
   );
-
-  // HSTS (only in production)
-  if (process.env.NODE_ENV === "production") {
-    response.headers.set(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains; preload"
-    );
-  }
-
   return response;
 }
-
-/**
- * Create a redirect response with security headers
- */
-function createRedirect(url: string, request: NextRequest): NextResponse {
-  const response = NextResponse.redirect(new URL(url, request.url));
-  return addSecurityHeaders(response);
-}
-
-/**
- * Create a next response with security headers
- */
-function createNext(_request: NextRequest): NextResponse {
-  const response = NextResponse.next();
-  return addSecurityHeaders(response);
-}
-
-// ============================================
-// MAIN MIDDLEWARE FUNCTION
-// ============================================
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ─────────────────────────────────────────
-  // 1. Skip static assets and internal paths
-  // ─────────────────────────────────────────
+  // Skip static assets
+  const skipPaths = ["/_next", "/favicon.ico", "/images", "/fonts", "/icons"];
   if (skipPaths.some((path) => pathname.startsWith(path))) {
     return NextResponse.next();
   }
 
-  // ─────────────────────────────────────────
-  // 2. Skip API routes that should bypass middleware
-  // ─────────────────────────────────────────
-  if (matchesAnyPattern(pathname, apiRoutes)) {
-    return NextResponse.next();
-  }
-
-  // ─────────────────────────────────────────
-  // 3. Get the user's session token
-  // ─────────────────────────────────────────
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-
-  const isAuthenticated = !!token;
-  const userRole = token?.role as string | undefined;
-  const userStatus = token?.status as string | undefined;
-
-  // ─────────────────────────────────────────
-  // 4. Check if user account is suspended
-  // ─────────────────────────────────────────
-  if (isAuthenticated && userStatus === "SUSPENDED") {
-    // Allow access to logout and suspended page only
-    if (pathname === "/suspended" || pathname === "/api/auth/signout") {
-      return createNext(request);
-    }
-    return createRedirect("/suspended", request);
-  }
-
-  // ─────────────────────────────────────────
-  // 5. Check if user needs to complete onboarding
-  // ─────────────────────────────────────────
-  if (isAuthenticated && userStatus === "PENDING") {
-    // Allow access to onboarding and logout only
-    if (
-      pathname.startsWith("/onboarding") ||
-      pathname === "/api/auth/signout"
-    ) {
-      return createNext(request);
-    }
-    return createRedirect("/onboarding", request);
-  }
-
-  // ─────────────────────────────────────────
-  // 6. Handle auth routes (login, register, etc.)
-  // ─────────────────────────────────────────
-  if (matchesAnyPattern(pathname, authRoutes)) {
-    if (isAuthenticated) {
-      // Redirect authenticated users to their dashboard
-      const redirectPath = getDefaultPathForRole(userRole || "GROCER");
-      return createRedirect(redirectPath, request);
-    }
-    // Allow unauthenticated users to access auth routes
-    return createNext(request);
-  }
-
-  // ─────────────────────────────────────────
-  // 7. Handle protected routes
-  // ─────────────────────────────────────────
-  if (matchesAnyPattern(pathname, protectedRoutes)) {
-    if (!isAuthenticated) {
-      // Redirect to login with callback URL
-      const callbackUrl = encodeURIComponent(pathname);
-      return createRedirect(`/login?callbackUrl=${callbackUrl}`, request);
-    }
-
-    // Check role-based access
-    if (userRole && !hasRoleAccess(userRole, pathname)) {
-      // User doesn't have access to this route
-      // Redirect to their default dashboard
-      const redirectPath = getDefaultPathForRole(userRole);
-      return createRedirect(redirectPath, request);
-    }
-
-    // User is authenticated and has access
-    return createNext(request);
-  }
-
-  // ─────────────────────────────────────────
-  // 8. Handle public routes
-  // ─────────────────────────────────────────
-  if (matchesAnyPattern(pathname, publicRoutes)) {
-    return createNext(request);
-  }
-
-  // ─────────────────────────────────────────
-  // 9. Default: Allow access with security headers
-  // ─────────────────────────────────────────
-  return createNext(request);
+  // In dev mode, auth is handled client-side. Just add security headers.
+  const response = NextResponse.next();
+  return addSecurityHeaders(response);
 }
 
-// ============================================
-// MIDDLEWARE CONFIGURATION
-// ============================================
-
-/**
- * Configure which routes the middleware should run on
- */
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder files
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff|woff2|ttf|eot)$).*)",
   ],
 };
-
-// ============================================
-// TYPE DECLARATIONS
-// ============================================
-
-/**
- * Extend NextAuth JWT type with custom properties
- */
-declare module "next-auth/jwt" {
-  interface JWT {
-    role?: string;
-    status?: string;
-    farmerId?: string;
-    grocerId?: string;
-  }
-}

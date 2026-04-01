@@ -1,65 +1,39 @@
-// Farm-to-Grocer MVP - Providers Wrapper Component
-// Path: components/providers.tsx
-//
-// A comprehensive providers wrapper that includes:
-// - NextAuth SessionProvider for authentication
-// - ThemeProvider for dark/light mode
-// - TanStack Query for server state management
-// - Zustand store hydration
-// - Toast notifications context
-// - Analytics provider (optional)
-// - Error boundary wrapper
-
 "use client";
 
 import * as React from "react";
-import { SessionProvider } from "next-auth/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { AuthProvider } from "@/lib/auth-context";
 
 // ============================================
 // QUERY CLIENT CONFIGURATION
 // ============================================
 
-/**
- * Create a stable QueryClient instance
- * Using a function to avoid sharing state between requests in SSR
- */
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        // Data is considered fresh for 60 seconds
         staleTime: 60 * 1000,
-        // Cache data for 5 minutes
         gcTime: 5 * 60 * 1000,
-        // Retry failed requests up to 3 times
         retry: 3,
-        // Exponential backoff for retries
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-        // Refetch on window focus in production
         refetchOnWindowFocus: process.env.NODE_ENV === "production",
-        // Don't refetch on mount if data is fresh
         refetchOnMount: false,
       },
       mutations: {
-        // Retry mutations once on failure
         retry: 1,
       },
     },
   });
 }
 
-// Browser-side query client (singleton)
 let browserQueryClient: QueryClient | undefined = undefined;
 
 function getQueryClient() {
   if (typeof window === "undefined") {
-    // Server: always create a new query client
     return makeQueryClient();
   } else {
-    // Browser: reuse existing client or create new one
     if (!browserQueryClient) {
       browserQueryClient = makeQueryClient();
     }
@@ -71,29 +45,20 @@ function getQueryClient() {
 // THEME PROVIDER WRAPPER
 // ============================================
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: string;
-  storageKey?: string;
-  enableSystem?: boolean;
-  disableTransitionOnChange?: boolean;
-}
-
 function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "farm-to-grocer-theme",
-  enableSystem = true,
-  disableTransitionOnChange = false,
   ...props
-}: ThemeProviderProps) {
+}: {
+  children: React.ReactNode;
+  defaultTheme?: string;
+}) {
   return (
     <NextThemesProvider
       attribute="class"
       defaultTheme={defaultTheme}
-      storageKey={storageKey}
-      enableSystem={enableSystem}
-      disableTransitionOnChange={disableTransitionOnChange}
+      storageKey="farm-to-grocer-theme"
+      enableSystem
       {...props}
     >
       {children}
@@ -110,14 +75,11 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
-}
-
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  ErrorBoundaryState
+> {
+  constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
@@ -127,44 +89,17 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to error reporting service
     console.error("Error caught by boundary:", error, errorInfo);
-
-    // Call optional error handler
-    this.props.onError?.(error, errorInfo);
-
-    // In production, you might want to send this to an error tracking service
-    // Example: Sentry.captureException(error, { extra: errorInfo });
   }
 
   render() {
     if (this.state.hasError) {
-      // Render fallback UI
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
-
       return (
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center max-w-md">
-            <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="h-8 w-8 text-destructive"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-            </div>
             <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
             <p className="text-muted-foreground mb-4">
-              We're sorry, but something unexpected happened. Please try refreshing the page.
+              Please try refreshing the page.
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -176,82 +111,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         </div>
       );
     }
-
     return this.props.children;
   }
 }
 
 // ============================================
-// ANALYTICS PROVIDER (Optional)
-// ============================================
-
-interface AnalyticsContextValue {
-  trackEvent: (event: string, properties?: Record<string, any>) => void;
-  trackPageView: (url: string) => void;
-  identify: (userId: string, traits?: Record<string, any>) => void;
-}
-
-const AnalyticsContext = React.createContext<AnalyticsContextValue | null>(null);
-
-export function useAnalytics() {
-  const context = React.useContext(AnalyticsContext);
-  if (!context) {
-    // Return no-op functions if analytics not configured
-    return {
-      trackEvent: () => { },
-      trackPageView: () => { },
-      identify: () => { },
-    };
-  }
-  return context;
-}
-
-interface AnalyticsProviderProps {
-  children: React.ReactNode;
-  enabled?: boolean;
-}
-
-function AnalyticsProvider({ children, enabled = true }: AnalyticsProviderProps) {
-  const value = React.useMemo<AnalyticsContextValue>(
-    () => ({
-      trackEvent: (event, properties) => {
-        if (!enabled || process.env.NODE_ENV !== "production") {
-          console.log("[Analytics] Event:", event, properties);
-          return;
-        }
-        // Implement your analytics tracking here
-        // Example: posthog.capture(event, properties);
-        // Example: gtag('event', event, properties);
-      },
-      trackPageView: (url) => {
-        if (!enabled || process.env.NODE_ENV !== "production") {
-          console.log("[Analytics] Page View:", url);
-          return;
-        }
-        // Implement page view tracking
-        // Example: gtag('config', GA_ID, { page_path: url });
-      },
-      identify: (userId, traits) => {
-        if (!enabled || process.env.NODE_ENV !== "production") {
-          console.log("[Analytics] Identify:", userId, traits);
-          return;
-        }
-        // Implement user identification
-        // Example: posthog.identify(userId, traits);
-      },
-    }),
-    [enabled]
-  );
-
-  return (
-    <AnalyticsContext.Provider value={value}>
-      {children}
-    </AnalyticsContext.Provider>
-  );
-}
-
-// ============================================
-// CART CONTEXT (Zustand Alternative)
+// CART CONTEXT
 // ============================================
 
 interface CartItem {
@@ -284,7 +149,6 @@ export function useCart() {
 function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = React.useState<CartItem[]>([]);
 
-  // Load cart from localStorage on mount
   React.useEffect(() => {
     const savedCart = localStorage.getItem("farm-to-grocer-cart");
     if (savedCart) {
@@ -296,7 +160,6 @@ function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Save cart to localStorage on change
   React.useEffect(() => {
     localStorage.setItem("farm-to-grocer-cart", JSON.stringify(items));
   }, [items]);
@@ -323,107 +186,16 @@ function CartProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const clearCart = React.useCallback(() => {
-    setItems([]);
-  }, []);
-
-  const getItemCount = React.useCallback(() => {
-    return items.reduce((sum, item) => sum + item.quantity, 0);
-  }, [items]);
-
-  const getSubtotal = React.useCallback(() => {
-    return items.reduce((sum, item) => sum + item.pricePerUnit * item.quantity, 0);
-  }, [items]);
+  const clearCart = React.useCallback(() => setItems([]), []);
+  const getItemCount = React.useCallback(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
+  const getSubtotal = React.useCallback(() => items.reduce((sum, item) => sum + item.pricePerUnit * item.quantity, 0), [items]);
 
   const value = React.useMemo<CartContextValue>(
-    () => ({
-      items,
-      addItem,
-      removeItem,
-      updateQuantity,
-      clearCart,
-      getItemCount,
-      getSubtotal,
-    }),
+    () => ({ items, addItem, removeItem, updateQuantity, clearCart, getItemCount, getSubtotal }),
     [items, addItem, removeItem, updateQuantity, clearCart, getItemCount, getSubtotal]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
-}
-
-// ============================================
-// NOTIFICATION CONTEXT
-// ============================================
-
-interface Notification {
-  id: string;
-  type: "info" | "success" | "warning" | "error";
-  title: string;
-  message?: string;
-  duration?: number;
-}
-
-interface NotificationContextValue {
-  notifications: Notification[];
-  addNotification: (notification: Omit<Notification, "id">) => void;
-  removeNotification: (id: string) => void;
-  clearNotifications: () => void;
-}
-
-const NotificationContext = React.createContext<NotificationContextValue | null>(null);
-
-export function useNotifications() {
-  const context = React.useContext(NotificationContext);
-  if (!context) {
-    throw new Error("useNotifications must be used within a NotificationProvider");
-  }
-  return context;
-}
-
-function NotificationProvider({ children }: { children: React.ReactNode }) {
-  const [notifications, setNotifications] = React.useState<Notification[]>([]);
-
-  const addNotification = React.useCallback(
-    (notification: Omit<Notification, "id">) => {
-      const id = Math.random().toString(36).substring(2, 9);
-      const newNotification = { ...notification, id };
-
-      setNotifications((prev) => [...prev, newNotification]);
-
-      // Auto-remove after duration (default 5 seconds)
-      const duration = notification.duration ?? 5000;
-      if (duration > 0) {
-        setTimeout(() => {
-          setNotifications((prev) => prev.filter((n) => n.id !== id));
-        }, duration);
-      }
-    },
-    []
-  );
-
-  const removeNotification = React.useCallback((id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  }, []);
-
-  const clearNotifications = React.useCallback(() => {
-    setNotifications([]);
-  }, []);
-
-  const value = React.useMemo<NotificationContextValue>(
-    () => ({
-      notifications,
-      addNotification,
-      removeNotification,
-      clearNotifications,
-    }),
-    [notifications, addNotification, removeNotification, clearNotifications]
-  );
-
-  return (
-    <NotificationContext.Provider value={value}>
-      {children}
-    </NotificationContext.Provider>
-  );
 }
 
 // ============================================
@@ -432,86 +204,34 @@ function NotificationProvider({ children }: { children: React.ReactNode }) {
 
 export interface ProvidersProps {
   children: React.ReactNode;
-  /**
-   * NextAuth session (optional, for SSR)
-   */
-  session?: any;
-  /**
-   * Default theme
-   */
   defaultTheme?: "light" | "dark" | "system";
-  /**
-   * Enable analytics
-   */
-  enableAnalytics?: boolean;
-  /**
-   * Show React Query devtools
-   */
   showQueryDevtools?: boolean;
 }
 
-/**
- * Providers Component
- *
- * Wraps the application with all necessary context providers.
- * Should be used in the root layout.
- *
- * @example
- * // In app/layout.tsx
- * import { Providers } from "@/components/providers";
- *
- * export default function RootLayout({ children }) {
- *   return (
- *     <html>
- *       <body>
- *         <Providers>{children}</Providers>
- *       </body>
- *     </html>
- *   );
- * }
- */
 export function Providers({
   children,
-  session,
   defaultTheme = "system",
-  enableAnalytics = true,
   showQueryDevtools = process.env.NODE_ENV === "development",
 }: ProvidersProps) {
-  // Get or create query client
   const queryClient = getQueryClient();
 
   return (
     <ErrorBoundary>
-      <SessionProvider session={session}>
+      <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme={defaultTheme}>
-            <AnalyticsProvider enabled={enableAnalytics}>
-              <NotificationProvider>
-                <CartProvider>
-                  {children}
-                </CartProvider>
-              </NotificationProvider>
-            </AnalyticsProvider>
+            <CartProvider>
+              {children}
+            </CartProvider>
           </ThemeProvider>
           {showQueryDevtools && (
             <ReactQueryDevtools initialIsOpen={false} position="bottom" />
           )}
         </QueryClientProvider>
-      </SessionProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
 
-// ============================================
-// EXPORTS
-// ============================================
-
-export {
-  ThemeProvider,
-  ErrorBoundary,
-  AnalyticsProvider,
-  CartProvider,
-  NotificationProvider,
-};
-
+export { ThemeProvider, ErrorBoundary, CartProvider };
 export default Providers;

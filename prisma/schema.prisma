@@ -1,12 +1,12 @@
 // Farm-to-Grocer MVP - Prisma Schema
-// Database: PostgreSQL
+// Database: SQLite (dev) / PostgreSQL (production)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -14,30 +14,18 @@ datasource db {
 // USER & AUTHENTICATION
 // ============================================
 
-enum UserRole {
-  FARMER
-  GROCER
-  ADMIN
-}
-
-enum AccountStatus {
-  PENDING
-  ACTIVE
-  SUSPENDED
-}
-
 model User {
-  id            String        @id @default(cuid())
-  email         String        @unique
+  id            String    @id @default(cuid())
+  email         String    @unique
   password      String
   name          String
   phone         String?
-  role          UserRole
-  status        AccountStatus @default(PENDING)
+  role          String    @default("FARMER") // FARMER, GROCER, ADMIN
+  status        String    @default("PENDING") // PENDING, ACTIVE, SUSPENDED
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
   farmer        Farmer?
@@ -45,6 +33,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   notifications Notification[]
+  activities    Activity[]
 
   @@index([email])
   @@index([role])
@@ -56,12 +45,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -90,96 +79,65 @@ model VerificationToken {
 // ============================================
 
 model Farmer {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  farmName    String
-  description String?  @db.Text
-  address     String
-  city        String
-  state       String
-  zipCode     String
-  latitude    Float?
-  longitude   Float?
-  certifications String[] // e.g., ["Organic", "Non-GMO"]
-  rating      Float    @default(0)
-  totalSales  Int      @default(0)
-  isVerified  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  farmName           String
+  description        String?
+  address            String
+  city               String
+  state              String
+  zipCode            String
+  latitude           Float?
+  longitude          Float?
+  certifications     String   @default("[]") // JSON array
+  rating             Float    @default(0)
+  totalSales         Int      @default(0)
+  isVerified         Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   // Relations
   user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   products       Product[]
   orders         Order[]       @relation("FarmerOrders")
   connections    Connection[]  @relation("FarmerConnections")
+  promotions     Promotion[]
+  invoices       Invoice[]     @relation("FarmerInvoices")
 
-  // Additional fields from external repo
-  phone          String?
-  deliveryDays   String[]
-  leadTimeDays   Int?          @default(2)
-  minimumOrderAmount Float?    @default(0)
-  story          String?       @db.Text
+  // Additional fields
+  phone              String?
+  deliveryDays       String   @default("[]") // JSON array
+  leadTimeDays       Int?     @default(2)
+  minimumOrderAmount Float?   @default(0)
+  story              String?
 
   @@index([city, state])
   @@index([isVerified])
 }
 
-enum ProductCategory {
-  VEGETABLES
-  FRUITS
-  DAIRY
-  MEAT
-  POULTRY
-  GRAINS
-  HERBS
-  EGGS
-  HONEY
-  OTHER
-}
-
-enum ProductUnit {
-  LB
-  KG
-  OZ
-  BUNCH
-  DOZEN
-  GALLON
-  LITER
-  PIECE
-  CASE
-  PALLET
-}
-
-enum ProductStatus {
-  DRAFT
-  ACTIVE
-  OUT_OF_STOCK
-  DISCONTINUED
-}
-
 model Product {
-  id              String          @id @default(cuid())
+  id              String   @id @default(cuid())
   farmerId        String
   name            String
-  description     String?         @db.Text
-  category        ProductCategory
-  unit            ProductUnit
+  description     String?
+  category        String   // VEGETABLES, FRUITS, DAIRY, MEAT, POULTRY, GRAINS, HERBS, EGGS, HONEY, OTHER
+  unit            String   // LB, KG, OZ, BUNCH, DOZEN, GALLON, LITER, PIECE, CASE, PALLET
   pricePerUnit    Float
-  packSize        String          @default("1 unit")
-  minOrderQty     Int             @default(1)
+  packSize        String   @default("1 unit")
+  minOrderQty     Int      @default(1)
   maxOrderQty     Int?
   availableQty    Int
-  images          String[]
-  isOrganic       Boolean         @default(false)
+  images          String   @default("[]") // JSON array
+  isOrganic       Boolean  @default(false)
   harvestDate     DateTime?
   expiryDate      DateTime?
-  status          ProductStatus   @default(ACTIVE)
-  tags            String[]
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  status          String   @default("ACTIVE") // DRAFT, ACTIVE, OUT_OF_STOCK, DISCONTINUED
+  tags            String   @default("[]") // JSON array
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
-  farmer          Farmer          @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  farmer          Farmer     @relation(fields: [farmerId], references: [id], onDelete: Cascade)
   orderItems      OrderItem[]
   cartItems       CartItem[]
 
@@ -197,8 +155,8 @@ model Grocer {
   id            String   @id @default(cuid())
   userId        String   @unique
   businessName  String
-  businessType  String   // e.g., "Supermarket", "Restaurant", "Cafe"
-  description   String?  @db.Text
+  businessType  String
+  description   String?
   address       String
   city          String
   state         String
@@ -212,18 +170,19 @@ model Grocer {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orders        Order[]    @relation("GrocerOrders")
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders        Order[]      @relation("GrocerOrders")
   cartItems     CartItem[]
   savedFarmers  SavedFarmer[]
   connections   Connection[] @relation("GrocerConnections")
+  invoices      Invoice[]    @relation("GrocerInvoices")
 
-  // Additional fields from external repo
+  // Additional fields
   phone                 String?
   receivingAddress      String?
-  receivingDays         String[]
-  preferredDeliveryDays String[]
-  categoriesOfInterest  String[]
+  receivingDays         String   @default("[]") // JSON array
+  preferredDeliveryDays String   @default("[]") // JSON array
+  categoriesOfInterest  String   @default("[]") // JSON array
 
   @@index([city, state])
   @@index([isVerified])
@@ -260,24 +219,18 @@ model SavedFarmer {
 // B2B CONNECTIONS
 // ============================================
 
-enum ConnectionStatus {
-  PENDING
-  APPROVED
-  DECLINED
-}
-
 model Connection {
-  id          String           @id @default(cuid())
+  id          String    @id @default(cuid())
   farmerId    String
   grocerId    String
-  status      ConnectionStatus @default(PENDING)
-  requestedAt DateTime         @default(now())
+  status      String    @default("PENDING") // PENDING, APPROVED, DECLINED
+  requestedAt DateTime  @default(now())
   approvedAt  DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  farmer      Farmer           @relation("FarmerConnections", fields: [farmerId], references: [id], onDelete: Cascade)
-  grocer      Grocer           @relation("GrocerConnections", fields: [grocerId], references: [id], onDelete: Cascade)
+  farmer      Farmer    @relation("FarmerConnections", fields: [farmerId], references: [id], onDelete: Cascade)
+  grocer      Grocer    @relation("GrocerConnections", fields: [grocerId], references: [id], onDelete: Cascade)
 
   @@unique([farmerId, grocerId])
   @@index([farmerId])
@@ -289,57 +242,35 @@ model Connection {
 // ORDERS & TRANSACTIONS
 // ============================================
 
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  PROCESSING
-  READY_FOR_PICKUP
-  OUT_FOR_DELIVERY
-  DELIVERED
-  CANCELLED
-  REFUNDED
-}
-
-enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-  REFUNDED
-}
-
-enum DeliveryMethod {
-  PICKUP
-  DELIVERY
-}
-
 model Order {
-  id              String         @id @default(cuid())
-  orderNumber     String         @unique
+  id              String    @id @default(cuid())
+  orderNumber     String    @unique
   farmerId        String
   grocerId        String
-  status          OrderStatus    @default(PENDING)
-  paymentStatus   PaymentStatus  @default(PENDING)
-  deliveryMethod  DeliveryMethod
+  status          String    @default("PENDING") // PENDING, CONFIRMED, PROCESSING, READY_FOR_PICKUP, OUT_FOR_DELIVERY, DELIVERED, CANCELLED, REFUNDED
+  paymentStatus   String    @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  deliveryMethod  String    // PICKUP, DELIVERY
   subtotal        Float
-  tax             Float          @default(0)
-  deliveryFee     Float          @default(0)
+  tax             Float     @default(0)
+  deliveryFee     Float     @default(0)
   total           Float
-  notes           String?        @db.Text
+  notes           String?
   deliveryAddress String?
   deliveryDate    DateTime?
   confirmedAt     DateTime?
   completedAt     DateTime?
   cancelledAt     DateTime?
   cancelReason    String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
-  farmer          Farmer         @relation("FarmerOrders", fields: [farmerId], references: [id])
-  grocer          Grocer         @relation("GrocerOrders", fields: [grocerId], references: [id])
+  farmer          Farmer      @relation("FarmerOrders", fields: [farmerId], references: [id])
+  grocer          Grocer      @relation("GrocerOrders", fields: [grocerId], references: [id])
   items           OrderItem[]
   payment         Payment?
   messages        OrderMessage[]
+  invoice         Invoice?
 
   @@index([farmerId])
   @@index([grocerId])
@@ -351,9 +282,9 @@ model OrderItem {
   id           String  @id @default(cuid())
   orderId      String
   productId    String
-  productName  String  // Snapshot at time of order
+  productName  String
   quantity     Int
-  pricePerUnit Float   // Snapshot at time of order
+  pricePerUnit Float
   total        Float
 
   // Relations
@@ -364,19 +295,66 @@ model OrderItem {
 }
 
 model Payment {
-  id              String        @id @default(cuid())
-  orderId         String        @unique
+  id              String    @id @default(cuid())
+  orderId         String    @unique
   amount          Float
-  method          String        // e.g., "stripe", "paypal"
+  method          String
   transactionId   String?
-  status          PaymentStatus @default(PENDING)
+  status          String    @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
   paidAt          DateTime?
   refundedAt      DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
-  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// PROMOTIONS
+// ============================================
+
+model Promotion {
+  id             String   @id @default(cuid())
+  farmerId       String
+  name           String
+  description    String
+  type           String   // PERCENTAGE, FIXED, BOGO
+  value          Float
+  minOrderAmount Float    @default(0)
+  maxUses        Int?
+  usedCount      Int      @default(0)
+  startDate      String   // ISO date string
+  endDate        String   // ISO date string
+  isActive       Boolean  @default(true)
+  products       String   @default("[]") // JSON array of product IDs
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  farmer         Farmer   @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// INVOICES
+// ============================================
+
+model Invoice {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  farmerId      String
+  grocerId      String
+  invoiceNumber String   @unique
+  amount        Float
+  tax           Float    @default(0)
+  total         Float
+  status        String   @default("DRAFT") // DRAFT, SENT, PAID, OVERDUE, CANCELLED
+  dueDate       String
+  paidAt        String?
+  paymentMethod String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  order         Order    @relation(fields: [orderId], references: [id])
+  farmer        Farmer   @relation("FarmerInvoices", fields: [farmerId], references: [id])
+  grocer        Grocer   @relation("GrocerInvoices", fields: [grocerId], references: [id])
 }
 
 // ============================================
@@ -387,7 +365,7 @@ model OrderMessage {
   id        String   @id @default(cuid())
   orderId   String
   senderId  String
-  message   String   @db.Text
+  message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
@@ -397,31 +375,44 @@ model OrderMessage {
   @@index([orderId])
 }
 
-enum NotificationType {
-  ORDER_PLACED
-  ORDER_CONFIRMED
-  ORDER_SHIPPED
-  ORDER_DELIVERED
-  ORDER_CANCELLED
-  NEW_MESSAGE
-  PRODUCT_LOW_STOCK
-  PAYMENT_RECEIVED
-  SYSTEM
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  subject    String
+  body       String
+  isRead     Boolean  @default(false)
+  threadId   String?
+  createdAt  DateTime @default(now())
 }
 
 model Notification {
-  id        String           @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
-  type      NotificationType
+  type      String   // ORDER_PLACED, ORDER_CONFIRMED, ORDER_SHIPPED, ORDER_DELIVERED, ORDER_CANCELLED, NEW_MESSAGE, PRODUCT_LOW_STOCK, PAYMENT_RECEIVED, SYSTEM
   title     String
   message   String
   link      String?
-  isRead    Boolean          @default(false)
-  createdAt DateTime         @default(now())
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 
   // Relations
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([isRead])
+}
+
+// ============================================
+// ACTIVITY LOG
+// ============================================
+
+model Activity {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String
+  description String
+  metadata    String   @default("{}") // JSON
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
 }

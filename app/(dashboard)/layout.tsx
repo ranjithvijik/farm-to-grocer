@@ -1,62 +1,38 @@
-// Farm-to-Grocer MVP - Dashboard Layout
-// Path: app/(dashboard)/layout.tsx
-//
-// A comprehensive dashboard layout with:
-// - Collapsible sidebar navigation
-// - Top header with user menu
-// - Role-based navigation (Farmer/Grocer/Admin)
-// - Mobile-responsive design with slide-out drawer
-// - Breadcrumb navigation
-// - Notification bell
-// - Search functionality
+// Farm-to-Grocer - Dashboard Layout
+// Auth is handled client-side via AuthProvider.
 
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+"use client";
+
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 import { DashboardShell } from "./dashboard-shell";
-
-// ============================================
-// METADATA
-// ============================================
-
-export const metadata = {
-  title: {
-    template: "%s | Dashboard",
-    default: "Dashboard",
-  },
-  description: "Manage your Farm to Grocer account",
-};
-
-// ============================================
-// DASHBOARD LAYOUT COMPONENT
-// ============================================
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-  // Get the user session
-  const session = await getServerSession(authOptions);
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
 
-  // Redirect to login if not authenticated
-  if (!session?.user) {
-    redirect("/login?callbackUrl=/farmer");
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isLoading, isAuthenticated, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
   }
 
-  // Check if user needs to complete onboarding
-  if (session.user.status === "PENDING") {
-    redirect("/onboarding");
+  if (!user) {
+    return null;
   }
 
-  // Check if user is suspended
-  if (session.user.status === "SUSPENDED") {
-    redirect("/suspended");
-  }
-
-  return (
-    <DashboardShell user={session.user}>
-      {children}
-    </DashboardShell>
-  );
+  return <DashboardShell user={user}>{children}</DashboardShell>;
 }
